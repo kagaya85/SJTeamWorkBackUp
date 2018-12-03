@@ -11,6 +11,9 @@ $(TARGETS):%:%.cpp
 .PHONY:clean all cleantxt
 cleantxt:
 	-rm -f *.txt
+	-rm -rf ./txt
 
 clean:    
 	-rm $(TARGETS)
+	-rm -f *.txt
+	-rm -rf ./txt

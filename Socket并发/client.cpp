@@ -563,7 +563,7 @@ void Sock::nonblock_connect()
 		if(fdStatus[i] == Idle && WaitTime[i] <= run_Time)
 		{
 			connect(fdList[i], (struct sockaddr*)&servaddr, sizeof(servaddr));
-			fdStatus[i] == Connecting;
+			fdStatus[i] = Connecting;
 		}
 			
 }
