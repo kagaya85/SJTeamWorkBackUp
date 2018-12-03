@@ -4,6 +4,7 @@
 #include <errno.h>
 #include <string>
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <sys/socket.h>
 #include <sys/wait.h>
 #include <netinet/in.h>
@@ -11,6 +12,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <signal.h>
+#include <dirent.h>
 
 using namespace std;
 
@@ -585,7 +587,7 @@ void Sock::block_exchange(const int client_fd)
 				close(client_fd);
 				return;
 			}
-			write(wfd, &sid[blockModeDefaultStep], sizeof(int));
+			/*write(wfd, &sid[blockModeDefaultStep], sizeof(int));
 			write(wfd, "\n", 1);
 			write(wfd, &pid[blockModeDefaultStep], sizeof(int));
 			write(wfd, "\n", 1);
@@ -596,7 +598,25 @@ void Sock::block_exchange(const int client_fd)
 			write(wfd, buffer_rec_c, randstrlen[blockModeDefaultStep]);
 			write(wfd, "\n", 1);
 			close(client_fd);
+			close(wfd);*/
+
+			char int_tmp_buff[10];
+			//write(wfd, &sid[blockModeDefaultStep], sizeof(int));
+			sprintf(int_tmp_buff, "%d", sid[blockModeDefaultStep]);
+			write(wfd, int_tmp_buff, strlen(int_tmp_buff));
+			write(wfd, "\n", 1);
+			//write(wfd, &pid[blockModeDefaultStep], sizeof(int));
+			sprintf(int_tmp_buff, "%d", pid[blockModeDefaultStep]);
+			write(wfd, int_tmp_buff, strlen(int_tmp_buff));
+			write(wfd, "\n", 1);
+			write(wfd, timestamp[blockModeDefaultStep], TimeStamplen);
+			write(wfd, "\n", 1);
+			for(int j = 0; j < randstrlen[blockModeDefaultStep]; ++j)
+				buffer_rec_c[j] = strbuff[blockModeDefaultStep][j];
+			write(wfd, buffer_rec_c, randstrlen[blockModeDefaultStep]);
+			write(wfd, "\n", 1);
 			close(wfd);
+
 			return;
 		}
 		
@@ -728,7 +748,7 @@ int Sock::nonblock_exchange(const int client_fd, const int sockid)
 				cerr << "open error" << endl;
 				return -2;
 			}
-			write(wfd, &sid[sockid], sizeof(int));
+			/*write(wfd, &sid[sockid], sizeof(int));
 			write(wfd, "\n", 1);
 			write(wfd, &pid[sockid], sizeof(int));
 			write(wfd, "\n", 1);
@@ -739,7 +759,25 @@ int Sock::nonblock_exchange(const int client_fd, const int sockid)
 			write(wfd, buffer_rec_c, randstrlen[sockid]);
 			write(wfd, "\n", 1);
 			close(client_fd);
+			close(wfd);*/
+
+			char int_tmp_buff[10];
+			//write(wfd, &sid[sockid], sizeof(int));
+			sprintf(int_tmp_buff, "%d", sid[sockid]);
+			write(wfd, int_tmp_buff, strlen(int_tmp_buff));
+			write(wfd, "\n", 1);
+			//write(wfd, &pid[sockid], sizeof(int));
+			sprintf(int_tmp_buff, "%d", pid[sockid]);
+			write(wfd, int_tmp_buff, strlen(int_tmp_buff));
+			write(wfd, "\n", 1);
+			write(wfd, timestamp[sockid], TimeStamplen);
+			write(wfd, "\n", 1);
+			for(int j = 0; j < randstrlen[sockid]; ++j)
+				buffer_rec_c[j] = strbuff[sockid][j];
+			write(wfd, buffer_rec_c, randstrlen[sockid]);
+			write(wfd, "\n", 1);
 			close(wfd);
+
 			return 1;
 		}
 		

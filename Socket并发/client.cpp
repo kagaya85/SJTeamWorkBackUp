@@ -5,6 +5,7 @@
 #include <errno.h>
 #include <string>
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <sys/socket.h>
 #include <sys/wait.h>
 #include <netinet/in.h>
@@ -13,6 +14,7 @@
 #include <unistd.h>
 #include <signal.h>
 #include <time.h>
+#include <dirent.h>
 
 #define DEFAULT_CON_NUM 100
 #define MaxConnNum 1024
@@ -431,10 +433,13 @@ void Sock::nofork_sock()
 		if(fdStatus[i] == Connecting)
 		{
 			testfds = sockfds;
-			ret = select(FD_SETSIZE, NULL, &testfds, NULL, &timeout);
+			do{
+				errno == 0;
+				ret = select(FD_SETSIZE, NULL, &testfds, NULL, &timeout);
+			} while(ret < 0 && errno == EINTR);
 			//cout << "return : " << ret << endl;
 			nonblock_connect(fdList[i]);
-			if(errno == EISCONN)
+			if(errno == EISCONN)	// 确认是否连接上
 			{
 				cout << "Pid: " << getpid() <<" connected to " << targetIpAddr << endl;
 				// 申请收发缓存
@@ -452,7 +457,7 @@ void Sock::nofork_sock()
 				clearState(i);
 				fdStatus[i] = Connected;
 			}
-			else if (ret < 0)
+			else if (ret < 0)	
 			{
 				close(fdList[i]);
 				if ((fdList[i] = socket(AF_INET, SOCK_STREAM, 0)) < 0)
@@ -465,19 +470,6 @@ void Sock::nofork_sock()
 
 				fdStatus[i] = Idle;
 				WaitTime[i] = run_Time + rand() % MaxTime;
-							
-				//nonblock_connect(fdList[i]);
-
-				// 申请收发缓存
-				//tcpbuffer[i] = new (nothrow) char[MaxBuffSize];
-				//if (tcpbuffer[i] == NULL)
-				//{
-				//	cerr << "New memory error" << endl;
-				//	fdList[i] = -1;
-				//	exit(EXIT_FAILURE);
-				//}
-				// 重置对应连接状态
-				//clearState(i);
 			}
 		}
 		
@@ -543,10 +535,16 @@ void Sock::nofork_sock()
 		int starti = i;
 		// cout << "starti: " << i << endl;
 		while(fdStatus[(i + 1)%fdNum] == Completed)
-		{	
-			i = (i + 1)%fdNum;
-			if (i == starti)	//	跳过已完成的句柄 遍历一圈后则表示全部完成
+		{
+			i = (i + 1) % fdNum;
+			if (i == starti) //	跳过已完成的句柄 遍历一圈后则表示全部完成
+			{
+				for(i = 0; i < fdNum; i++)
+				{
+					close(fdList[i]);	// 结束后关闭所有句柄
+				}
 				exit(EXIT_SUCCESS);
+			}
 		}
 		i = (i + 1)%fdNum;
 	}
@@ -554,28 +552,12 @@ void Sock::nofork_sock()
 /* 非阻塞连接单个句柄 */
 void Sock::nonblock_connect(const int fd)
 {
-    // fd_set connfds, testfds;
-    // struct timeval timeout = {10 ,0};
-
-    // FD_ZERO(&connfds);
-    // FD_SET(fd, &connfds);
-    // testfds = connfds;
     connect(fd, (struct sockaddr*)&servaddr, sizeof(servaddr));
-    // if(select(FD_SERSIZE, NULL, &testfds, NULL, &timeout) > 0)
-    //     cout << "Pid: " << getpid() <<" connected to " << targetIpAddr << endl;
-    // else
-    //     cerr << "Connect: " << strerror(errno) << endl;
 }
-
 /* 发起非阻塞连接fdList中的所有句柄 */
 void Sock::nonblock_connect()
 {
     fd_set connfds, testfds;
-
-    // FD_ZERO(&connfds);
-    // for(int i = 0; i < fdNum; i++)
-    //     FD_SET(fdList[i], &connfds);
-    // testfds = connfds;
 
 	for(int i = 0; i < fdNum; ++i)
 		if(fdStatus[i] == Idle && WaitTime[i] <= run_Time)
@@ -584,18 +566,6 @@ void Sock::nonblock_connect()
 			fdStatus[i] == Connecting;
 		}
 			
-    
-    // while(testfds)
-    // {
-    //     if(select(FD_SERSIZE, NULL, &testfds, NULL, &timeout) > 0)
-    //     {
-    //         testfds = testfds ^ connfds;
-    //         continue;
-    //     }
-    //     else{
-    //     	cerr << "Connect: " << strerror(errno) << endl;
-    //     }    
-    // }
 }
 
 void Sock::block_connect(const int fd)
@@ -720,7 +690,7 @@ int Sock::block_exchange(const int fd)
 						cerr << "open error" << endl;
 						return 0;
 					}
-					write(wfd, &sid, sizeof(int));
+					/*write(wfd, &sid, sizeof(int));
 					write(wfd, "\n", 1);
 					write(wfd, &pid[blockModeDefaultStep], sizeof(int));
 					write(wfd, "\n", 1);
@@ -730,7 +700,25 @@ int Sock::block_exchange(const int fd)
 						buffer_snd[j] = strbuff[blockModeDefaultStep][j];
 					write(wfd, buffer_snd, randstrlen[blockModeDefaultStep]);
 					write(wfd, "\n", 1);
+					close(wfd);*/
+
+					char int_tmp_buff[10];
+					//write(wfd, &sid, sizeof(int));
+					sprintf(int_tmp_buff, "%d", sid);
+					write(wfd, int_tmp_buff, strlen(int_tmp_buff));
+					write(wfd, "\n", 1);
+					//write(wfd, &pid[blockModeDefaultStep], sizeof(int));
+					sprintf(int_tmp_buff, "%d", pid[blockModeDefaultStep]);
+					write(wfd, int_tmp_buff, strlen(int_tmp_buff));
+					write(wfd, "\n", 1);
+					write(wfd, timestamp[blockModeDefaultStep], TimeStampLen - 1);
+					write(wfd, "\n", 1);
+					for (int j = 0; j < randstrlen[blockModeDefaultStep]; ++j)
+						buffer_snd[j] = strbuff[blockModeDefaultStep][j];
+					write(wfd, buffer_snd, randstrlen[blockModeDefaultStep]);
+					write(wfd, "\n", 1);
 					close(wfd);
+
 					return 1;
 				}
 				default:
@@ -776,7 +764,6 @@ int Sock::nonblock_exchange(const int fd, const int sockid)
 			                    (i == String ? strlen("99999") : 0) +
 			                    (i == Time || i == String);
 
-		
 		do
 		{
 			errno = 0;
@@ -787,7 +774,7 @@ int Sock::nonblock_exchange(const int fd, const int sockid)
 		{
 			cerr << "client" << "[" << getpid() <<"] read network error: " << strerror(errno) << endl;
 			close(fd);
-			return 1;
+			return -1;
 		}
 		else if(_rs < 0)
 		{
@@ -824,7 +811,8 @@ int Sock::nonblock_exchange(const int fd, const int sockid)
 		writeEnable[sockid] ^= 1;
 		if(i == Close)
 		{
-			close(fd);
+			if(forkFlag == true)
+				close(fd);
 			string filename = to_string(sid);
 			filename.append(".").append(to_string(pid[sockid])).append(".pid.txt");
 			int wfd;
@@ -833,7 +821,7 @@ int Sock::nonblock_exchange(const int fd, const int sockid)
 				cerr << "open error" << endl;
 				return -2;
 			}
-			write(wfd, &sid, sizeof(int));
+			/*write(wfd, &sid, sizeof(int));
 			write(wfd, "\n", 1);
 			write(wfd, &pid[sockid], sizeof(int));
 			write(wfd, "\n", 1);
@@ -843,7 +831,25 @@ int Sock::nonblock_exchange(const int fd, const int sockid)
 				buffer_snd[j] = strbuff[sockid][j];
 			write(wfd, buffer_snd, randstrlen[sockid]);
 			write(wfd, "\n", 1);
+			close(wfd);*/
+
+			char int_tmp_buff[10];
+			//write(wfd, &sid, sizeof(int));
+			sprintf(int_tmp_buff, "%d", sid);
+			write(wfd, int_tmp_buff, strlen(int_tmp_buff));
+			write(wfd, "\n", 1);
+			//write(wfd, &pid[sockid], sizeof(int));
+			sprintf(int_tmp_buff, "%d", pid[sockid]);
+			write(wfd, int_tmp_buff, strlen(int_tmp_buff));
+			write(wfd, "\n", 1);
+			write(wfd, timestamp[sockid], TimeStampLen - 1);
+			write(wfd, "\n", 1);
+			for (int j = 0; j < randstrlen[sockid]; ++j)
+				buffer_snd[j] = strbuff[sockid][j];
+			write(wfd, buffer_snd, randstrlen[sockid]);
+			write(wfd, "\n", 1);
 			close(wfd);
+
 			return 1;
 		}
 	}
@@ -932,7 +938,7 @@ int Sock::nonblock_exchange(const int fd, const int sockid)
 			{
 				cerr << "write network error: " << strerror(errno) << endl;
 				close(fd);
-				return 1;
+				return -1;
 			}
 			else if (_ws < 0 && (errno == EWOULDBLOCK || errno == EAGAIN))
 				return 0;
