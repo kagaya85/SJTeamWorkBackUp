@@ -576,7 +576,7 @@ void Sock::block_exchange(const int client_fd)
 					break;
 			}
 
-			string filename = to_string(sid[blockModeDefaultStep]);
+			/*string filename = to_string(sid[blockModeDefaultStep]);
 			filename.append(".").append(to_string(pid[blockModeDefaultStep])).append(".pid.txt");
 			int wfd;
 			if((wfd = open(filename.c_str(), O_WRONLY | O_CREAT, 0666)) < 0)
@@ -585,7 +585,7 @@ void Sock::block_exchange(const int client_fd)
 				close(client_fd);
 				return;
 			}
-			/*write(wfd, &sid[blockModeDefaultStep], sizeof(int));
+			write(wfd, &sid[blockModeDefaultStep], sizeof(int));
 			write(wfd, "\n", 1);
 			write(wfd, &pid[blockModeDefaultStep], sizeof(int));
 			write(wfd, "\n", 1);
@@ -598,12 +598,24 @@ void Sock::block_exchange(const int client_fd)
 			close(client_fd);
 			close(wfd);*/
 
+			if(opendir("./txt") == NULL)
+			{
+				mode_t mode = umask(0);
+    			mkdir("./txt", 0777);
+			}
+			string filename = "./txt/";
+			filename.append(to_string(sid[blockModeDefaultStep])).append(".").append(to_string(pid[blockModeDefaultStep])).append(".pid.txt");
+			int wfd;
+			if((wfd = open(filename.c_str(), O_WRONLY | O_CREAT, 0666)) < 0)
+			{
+				cerr << "open error" << endl;
+				close(client_fd);
+				return;
+			}
 			char int_tmp_buff[10];
-			//write(wfd, &sid[blockModeDefaultStep], sizeof(int));
 			sprintf(int_tmp_buff, "%d", sid[blockModeDefaultStep]);
 			write(wfd, int_tmp_buff, strlen(int_tmp_buff));
 			write(wfd, "\n", 1);
-			//write(wfd, &pid[blockModeDefaultStep], sizeof(int));
 			sprintf(int_tmp_buff, "%d", pid[blockModeDefaultStep]);
 			write(wfd, int_tmp_buff, strlen(int_tmp_buff));
 			write(wfd, "\n", 1);
@@ -738,7 +750,7 @@ int Sock::nonblock_exchange(const int client_fd, const int sockid)
 			 	return -1;
 			}
 
-			string filename = to_string(sid[sockid]);
+			/*string filename = to_string(sid[sockid]);
 			filename.append(".").append(to_string(pid[sockid])).append(".pid.txt");
 			int wfd;
 			if((wfd = open(filename.c_str(), O_WRONLY | O_CREAT, 0666)) < 0)
@@ -746,7 +758,7 @@ int Sock::nonblock_exchange(const int client_fd, const int sockid)
 				cerr << "open error" << endl;
 				return -2;
 			}
-			/*write(wfd, &sid[sockid], sizeof(int));
+			write(wfd, &sid[sockid], sizeof(int));
 			write(wfd, "\n", 1);
 			write(wfd, &pid[sockid], sizeof(int));
 			write(wfd, "\n", 1);
@@ -759,12 +771,23 @@ int Sock::nonblock_exchange(const int client_fd, const int sockid)
 			close(client_fd);
 			close(wfd);*/
 
+			if(opendir("./txt") == NULL)
+			{
+				mode_t mode = umask(0);
+    			mkdir("./txt", 0777);
+			}
+			string filename = "./txt/";
+			filename.append(to_string(sid[sockid])).append(".").append(to_string(pid[sockid])).append(".pid.txt");
+			int wfd;
+			if((wfd = open(filename.c_str(), O_WRONLY | O_CREAT, 0666)) < 0)
+			{
+				cerr << "open error" << endl;
+				return -2;
+			}
 			char int_tmp_buff[10];
-			//write(wfd, &sid[sockid], sizeof(int));
 			sprintf(int_tmp_buff, "%d", sid[sockid]);
 			write(wfd, int_tmp_buff, strlen(int_tmp_buff));
 			write(wfd, "\n", 1);
-			//write(wfd, &pid[sockid], sizeof(int));
 			sprintf(int_tmp_buff, "%d", pid[sockid]);
 			write(wfd, int_tmp_buff, strlen(int_tmp_buff));
 			write(wfd, "\n", 1);
