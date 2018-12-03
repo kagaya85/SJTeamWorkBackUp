@@ -435,10 +435,7 @@ void Sock::nofork_sock()
 						i == ii;
 
 					if ((clientfd = accept(listenfd, (struct sockaddr *)&cliaddr, &clilen)) < 0)
-					{
-						cerr << "Accept error: " << strerror(errno) << endl;
-						exit(EXIT_FAILURE);
-					}
+						break;
 				
 					//解析客户端地址
 					char ipbuff[INET_ADDRSTRLEN + 1] = {0};
@@ -455,6 +452,7 @@ void Sock::nofork_sock()
 						fdList[i] = -1;
 						continue;
 					}
+					
 					// 重置对应连接状态
 					clearState(i);
 					fdList[i] = clientfd;	// 加入句柄
