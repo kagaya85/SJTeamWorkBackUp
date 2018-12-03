@@ -852,11 +852,13 @@ int Sock::nonblock_exchange(const int fd, const int sockid)
 			string filename = "./txt/";
 			filename.append(to_string(sid)).append(".").append(to_string(pid[sockid])).append(".pid.txt");
 			int wfd;
+			errno = 0;
 			if ((wfd = open(filename.c_str(), O_WRONLY | O_CREAT, 0666)) < 0)
 			{
-				cerr << "open error" << endl;
+				cerr << "open error:" << strerror(errno) << endl;
 				return -2;
 			}
+			cout << "Clinet fd[" << fdList[sockid] << "] wfd is " << wfd << endl;
 			char int_tmp_buff[10];
 			sprintf(int_tmp_buff, "%d", sid);
 			write(wfd, int_tmp_buff, strlen(int_tmp_buff));
