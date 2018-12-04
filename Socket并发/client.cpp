@@ -682,27 +682,8 @@ int Sock::block_exchange(const int fd)
 				{
 					close(fd);
 
-					/*string filename = to_string(sid);
-					filename.append(".").append(to_string(pid[blockModeDefaultStep])).append(".pid.txt");
-					int wfd;
-					if ((wfd = open(filename.c_str(), O_WRONLY | O_CREAT, 0666)) < 0)
-					{
-						cerr << "open error" << endl;
-						return 0;
-					}
-					write(wfd, &sid, sizeof(int));
-					write(wfd, "\n", 1);
-					write(wfd, &pid[blockModeDefaultStep], sizeof(int));
-					write(wfd, "\n", 1);
-					write(wfd, timestamp[blockModeDefaultStep], TimeStampLen - 1);
-					write(wfd, "\n", 1);
-					for (int j = 0; j < randstrlen[blockModeDefaultStep]; ++j)
-						buffer_snd[j] = strbuff[blockModeDefaultStep][j];
-					write(wfd, buffer_snd, randstrlen[blockModeDefaultStep]);
-					write(wfd, "\n", 1);
-					close(wfd);*/
-					
-					if (opendir("./txt") == NULL)
+					DIR *dir;
+					if ((dir = opendir("./txt")) == NULL)
 					{
 						mode_t mode = umask(0);
 						mkdir("./txt", 0777);
@@ -729,7 +710,7 @@ int Sock::block_exchange(const int fd)
 					write(wfd, buffer_snd, randstrlen[blockModeDefaultStep]);
 					write(wfd, "\n", 1);
 					close(wfd);
-
+					closedir(dir);
 					return 1;
 				}
 				default:
