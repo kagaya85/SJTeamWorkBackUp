@@ -825,7 +825,7 @@ int Sock::nonblock_exchange(const int fd, const int sockid)
 			write(wfd, "\n", 1);
 			close(wfd);*/
 
-			if(opendir("./txt") == NULL)
+			if(access("./txt", F_OK) < 0)
 			{
 				mode_t mode = umask(0);
 				mkdir("./txt", 0777);

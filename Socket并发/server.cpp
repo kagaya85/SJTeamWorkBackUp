@@ -750,27 +750,6 @@ int Sock::nonblock_exchange(const int client_fd, const int sockid)
 			 	return -1;
 			}
 
-			/*string filename = to_string(sid[sockid]);
-			filename.append(".").append(to_string(pid[sockid])).append(".pid.txt");
-			int wfd;
-			if((wfd = open(filename.c_str(), O_WRONLY | O_CREAT, 0666)) < 0)
-			{
-				cerr << "open error" << endl;
-				return -2;
-			}
-			write(wfd, &sid[sockid], sizeof(int));
-			write(wfd, "\n", 1);
-			write(wfd, &pid[sockid], sizeof(int));
-			write(wfd, "\n", 1);
-			write(wfd, timestamp[sockid], TimeStamplen);
-			write(wfd, "\n", 1);
-			for(int j = 0; j < randstrlen[sockid]; ++j)
-				buffer_rec_c[j] = strbuff[sockid][j];
-			write(wfd, buffer_rec_c, randstrlen[sockid]);
-			write(wfd, "\n", 1);
-			close(client_fd);
-			close(wfd);*/
-
 			if(opendir("./txt") == NULL)
 			{
 				mode_t mode = umask(0);
