@@ -303,6 +303,7 @@ void Sock::fork_sock()
 					bufferp[blockModeDefaultStep] = 0;
 					block_exchange(clientfd);
 					delete tcpbuffer[blockModeDefaultStep];
+					cout << "Server [" << getpid() << "] save success!" << endl;
 					exit(EXIT_SUCCESS);
 				}
 				else
@@ -361,7 +362,7 @@ void Sock::fork_sock()
 					delete tcpbuffer[i];
 					tcpbuffer[i] = NULL;
 				}
-				cout << "Server [" << getpid() << "] return " << ret << endl;
+				// cout << "Server [" << getpid() << "] return " << ret << endl;
 				exit(EXIT_SUCCESS);
 			}
 			else 
@@ -576,27 +577,6 @@ void Sock::block_exchange(const int client_fd)
 					break;
 			}
 
-			/*string filename = to_string(sid[blockModeDefaultStep]);
-			filename.append(".").append(to_string(pid[blockModeDefaultStep])).append(".pid.txt");
-			int wfd;
-			if((wfd = open(filename.c_str(), O_WRONLY | O_CREAT, 0666)) < 0)
-			{
-				cerr << "open error" << endl;
-				close(client_fd);
-				return;
-			}
-			write(wfd, &sid[blockModeDefaultStep], sizeof(int));
-			write(wfd, "\n", 1);
-			write(wfd, &pid[blockModeDefaultStep], sizeof(int));
-			write(wfd, "\n", 1);
-			write(wfd, timestamp[blockModeDefaultStep], TimeStamplen);
-			write(wfd, "\n", 1);
-			for(int j = 0; j < randstrlen[blockModeDefaultStep]; ++j)
-				buffer_rec_c[j] = strbuff[blockModeDefaultStep][j];
-			write(wfd, buffer_rec_c, randstrlen[blockModeDefaultStep]);
-			write(wfd, "\n", 1);
-			close(client_fd);
-			close(wfd);*/
 
 			if(access("./txt", F_OK) < 0)
 			{

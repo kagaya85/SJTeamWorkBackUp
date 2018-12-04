@@ -318,9 +318,7 @@ void Sock::fork_sock()
 					cerr << "pid " << getpid() << " : New memory error" << endl;
 					exit(EXIT_FAILURE);
 				}
-				// 重置对应连接状态
-				clearState(i);
-				
+
 				while (true)
 				{
 					timeout = tmot;
@@ -331,23 +329,26 @@ void Sock::fork_sock()
 							cerr << "Create socket error: " << strerror(errno) << "(errno: " << errno << ")" << endl;
 							exit(EXIT_FAILURE);
 						}
-						flag = fcntl(sockfd, F_GETFL, 0);       //获取文件的flags值。
-						fcntl(sockfd, F_SETFL, flag | O_NONBLOCK);     //设置成非阻塞模式；
+						flag = fcntl(sockfd, F_GETFL, 0);		   //获取文件的flags值。
+						fcntl(sockfd, F_SETFL, flag | O_NONBLOCK); //设置成非阻塞模式；
 						FD_SET(sockfd, &sockfds);
 					}
 					testfds = sockfds;
 
 					sleep(rand() % MaxWaitTime); //随机等待一段时间再发出connect
 					nonblock_connect(sockfd);
-
-					if((ret = select(FD_SETSIZE, NULL, &testfds, NULL, NULL)) >= 0)
+					// 重置对应连接状态
+					clearState(i);
+					if ((ret = select(FD_SETSIZE, NULL, &testfds, NULL, NULL)) >= 0)
 					{
 						errno = 0;
 						nonblock_connect(sockfd);
 						if(errno == EISCONN)
 					    	cout << "Pid: " << getpid() <<" connected to " << targetIpAddr << endl;
+						else
+							cout << "Pid: " << getpid() <<" connect???: " << strerror(errno) << endl;
 					}
-					else if (ret < 0)
+					else
 					    cerr << strerror(errno) << endl;
 
 					for (ret = 0; ret != 1;)
