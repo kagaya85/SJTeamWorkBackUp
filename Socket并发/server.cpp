@@ -598,7 +598,7 @@ void Sock::block_exchange(const int client_fd)
 			close(client_fd);
 			close(wfd);*/
 
-			if(opendir("./txt") == NULL)
+			if(access("./txt", F_OK) < 0)
 			{
 				mode_t mode = umask(0);
     			mkdir("./txt", 0777);
@@ -750,7 +750,7 @@ int Sock::nonblock_exchange(const int client_fd, const int sockid)
 			 	return -1;
 			}
 
-			if(opendir("./txt") == NULL)
+			if(access("./txt", F_OK) < 0)
 			{
 				mode_t mode = umask(0);
     			mkdir("./txt", 0777);
