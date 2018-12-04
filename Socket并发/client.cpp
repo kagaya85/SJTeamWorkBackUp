@@ -56,6 +56,7 @@ private:
 	int bufferp[MaxConnNum]; 		//accept时对应位赋值0
 
 	int WaitTime[MaxConnNum];		//每个socket在connect前随机等待的时间
+	int MaxWaitTime; //随机等待时长上限
 
 	// int seed;
 	const int Limit = 256;
@@ -192,12 +193,12 @@ int main(int argc, const char** argv)
 Sock::Sock(const char* Ipaddr, const int Port, const bool BlockFlag, const bool ForkFlag, const int conNum)
 {
 	srand((unsigned int)(time(NULL)));
-
 	forkFlag = ForkFlag;
 	blockFlag = BlockFlag;
 	port = Port;
 	fdNum = conNum;
     targetIpAddr.assign(Ipaddr);
+	MaxWaitTime = fdNum / 10;
 
 	fdList = new(nothrow) int[fdNum];
 	if (!fdList)
@@ -336,12 +337,12 @@ void Sock::fork_sock()
 					}
 					testfds = sockfds;
 
-					const int MaxTime = 15; //随机等待时长上限，暂定15s
-					sleep(rand() % MaxTime); //随机等待一段时间再发出connect
+					sleep(rand() % MaxWaitTime); //随机等待一段时间再发出connect
 					nonblock_connect(sockfd);
 
 					if((ret = select(FD_SETSIZE, NULL, &testfds, NULL, NULL)) >= 0)
 					{
+						errno = 0;
 						nonblock_connect(sockfd);
 						if(errno == EISCONN)
 					    	cout << "Pid: " << getpid() <<" connected to " << targetIpAddr << endl;
@@ -377,7 +378,7 @@ void Sock::fork_sock()
 								delete tcpbuffer[i];
 								tcpbuffer[i] = NULL;
 							}
-							cout << "Client [" << getpid() << "] exit success" << endl;
+							cout << "Client pid[" << getpid() << "] exit success" << endl;
 							exit(EXIT_SUCCESS);
 						}
 					}
@@ -409,10 +410,9 @@ void Sock::nofork_sock()
 
 	int i = 0;
 	
-	const int MaxTime = 15; //随机等待时长上限，暂定15s
 	for(int i = 0; i < fdNum; ++i)
 	{
-		WaitTime[i] = rand() % MaxTime;
+		WaitTime[i] = rand() % MaxWaitTime;
 		fdStatus[i] = Idle;
 	}
 
@@ -469,7 +469,7 @@ void Sock::nofork_sock()
 				fcntl(fdList[i], F_SETFL, flag | O_NONBLOCK); //设置成非阻塞模式；
 
 				fdStatus[i] = Idle;
-				WaitTime[i] = run_Time + rand() % MaxTime;
+				WaitTime[i] = run_Time + rand() % MaxWaitTime;
 			}
 		}
 		
@@ -505,7 +505,7 @@ void Sock::nofork_sock()
 					curstep[i] = Sid;   //connect时对应位置Sid
 					writeEnable[i] = 1; //connect时对应位置1
 					fdStatus[i] = Idle;
-					WaitTime[i] = run_Time + rand() % MaxTime; //重置重发connect延时
+					WaitTime[i] = run_Time + rand() % MaxWaitTime; //重置重发connect延时
 					bufferp[i] = 0;
 				}
 				else if (ret == -2)
@@ -570,8 +570,7 @@ void Sock::nonblock_connect()
 
 void Sock::block_connect(const int fd)
 {
-	const int MaxTime = 15; //随机等待时长上限，暂定15s
-	sleep(rand() % MaxTime); //随机等待一段时间再发出connect
+	sleep(rand() % MaxWaitTime); //随机等待一段时间再发出connect
 
     int ret;
     ret = connect(fd, (struct sockaddr*)&servaddr, sizeof(servaddr));
@@ -771,6 +770,7 @@ int Sock::nonblock_exchange(const int fd, const int sockid)
 			if (_rs < 0 && (errno == EWOULDBLOCK || errno == EAGAIN))
 				return 0;
 			cerr << "read error: "<< strerror(errno) << endl;
+			cerr << "bufferlen[sockid] - bufferp[sockid] : " << bufferlen[sockid] - bufferp[sockid] << endl;
 			close(fd);
 			return -1;
 		}
@@ -837,7 +837,6 @@ int Sock::nonblock_exchange(const int fd, const int sockid)
 				cerr << "open error:" << strerror(errno) << endl;
 				return -2;
 			}
-			cout << "Clinet fd[" << fdList[sockid] << "] wfd is " << wfd << endl;
 			char int_tmp_buff[10];
 			sprintf(int_tmp_buff, "%d", sid);
 			write(wfd, int_tmp_buff, strlen(int_tmp_buff));
