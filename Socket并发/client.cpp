@@ -682,8 +682,7 @@ int Sock::block_exchange(const int fd)
 				{
 					close(fd);
 
-					DIR *dir;
-					if ((dir = opendir("./txt")) == NULL)
+					if (access("./txt", F_OK) < 0)
 					{
 						mode_t mode = umask(0);
 						mkdir("./txt", 0777);
@@ -710,7 +709,6 @@ int Sock::block_exchange(const int fd)
 					write(wfd, buffer_snd, randstrlen[blockModeDefaultStep]);
 					write(wfd, "\n", 1);
 					close(wfd);
-					closedir(dir);
 					return 1;
 				}
 				default:
