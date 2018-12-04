@@ -794,6 +794,8 @@ int Sock::nonblock_exchange(const int fd, const int sockid)
 		if(strcmp(tcpbuffer[sockid], stdstr[i].c_str()))
 		{
 			cerr << "information exchange error" << endl;
+			cerr << "need: " << stdstr[i] << endl;
+			cerr << "recv: " << tcpbuffer[sockid] << endl;
 			close(fd);
 			return -1;
 		}
