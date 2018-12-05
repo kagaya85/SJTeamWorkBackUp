@@ -4,6 +4,10 @@
 Datalink::Datalink()
 {
     header = NULL;
+    dataLinkEvent = no_event;
+    NetworkDatalinkSeq = 0;
+    DatalinkPhysicalSeq = 0;
+    networkStatus = Enable; // 默认网络层初始enable
 }
 
 Datalink::~Datalink()
@@ -93,6 +97,7 @@ void Datalink::enable_network_layer()
     pid_t pid;
     pid = getPidByName("network");
     kill(pid, SIG_NETWORK_LAYER_ENABLE);
+    networkStatus = Enable;
 }
 
 void Datalink::disable_network_layer()
@@ -100,11 +105,7 @@ void Datalink::disable_network_layer()
     pid_t pid;
     pid = getPidByName("network");
     kill(pid, SIG_NETWORK_LAYER_DISABLE);
-}
-
-void Datalink::from_network_layer(packet *pkt)
-{
-    
+    networkStatus = Disable;
 }
 
 void Datalink::start_ack_timer()
@@ -176,6 +177,43 @@ void Datalink::stop_ack_timer()
             return;
         }
     }    
+}
+
+int Datalink::from_network_layer(packet *pkt)
+{
+    char fileName[50];
+    
+    if (networkStatus == Disable)
+    {
+        cerr << "network layer disabled" << endl;
+        return -1;
+    }
+    
+    sprintf(fileName, "network_datalink.share.%04d", frame_seq);
+    int fd = open(fileName);
+    if (fd < 0)
+    {
+        cerr << "open " << fileName << "error" << endl;
+        return -1;
+    }
+
+    flock(fd, LOCK_EX);
+    int readByteNum = read(fd, pkt.data, MAX_PKT);
+    seq_inc(NetworkDatalinkSeq);
+    return 0;
+}
+
+void Datalink::wait_for_event(event_type *event)
+{
+    sleep();
+}
+
+void Datalink::seq_inc(seq_nr k)
+{
+    if(k < MAX_SHARE_SEQ) 
+        k = k + 1; 
+    else 
+        k = 0;
 }
 
 void Datalink::add_a_second(int signal)

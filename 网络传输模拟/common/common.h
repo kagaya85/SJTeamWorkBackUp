@@ -4,14 +4,14 @@
 #include <signal.h>
 #include <unistd.h>
 
-#define SIG_CHSUM_ERR __SIGRTMIN + 1
-#define SIG_FRAME_ARRIVAL __SIGRTMIN + 2
-#define SIG_NETWORK_LAYER_READY __SIGRTMIN + 3
-#define SIG_NETWORK_LAYER_ENABLE __SIGRTMIN + 4
-#define SIG_NETWORK_LAYER_DISABLE __SIGRTMIN + 5
+#define SIG_CHSUM_ERR (SIGRTMIN + 1)
+#define SIG_FRAME_ARRIVAL (SIGRTMIN + 2)
+#define SIG_NETWORK_LAYER_READY (SIGRTMIN + 3)
+#define SIG_NETWORK_LAYER_ENABLE (SIGRTMIN + 4)
+#define SIG_NETWORK_LAYER_DISABLE (SIGRTMIN + 5)
 #define MAX_PKT 1024
 
-#define inc(k) if(k<MAX_SEQ)
+#define inc(k) if(k<MAX_SEQ) k = k + 1; else k = 0;
 
 pid_t getPidByName(char *task_name);
 
@@ -19,7 +19,7 @@ typedef unsigned int seq_nr;    // 发送序号
 
 typedef strcut {
     unsigned char data[MAX_PKT];
-};
+} packet;
 
 typedef enum {
     dataFrame,
@@ -28,6 +28,7 @@ typedef enum {
 } frame_type;
 
 typedef enum {
+    no_event,
     frame_arrival,
     cksum_err,
     timeout,
@@ -35,6 +36,10 @@ typedef enum {
     ack_timeout
 } event_type;
 
+typedef enum {
+    Enable,
+    Disable
+} layer_status;
 typedef struct {
     frame_kind kind,
     seq_nr  seq,
