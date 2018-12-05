@@ -22,10 +22,10 @@ typedef strcut {
 };
 
 typedef enum {
-    data,
-    ack,
-    nak
-} frame_kind;
+    dataFrame,
+    ackFrame,
+    nakFrame
+} frame_type;
 
 typedef enum {
     frame_arrival,

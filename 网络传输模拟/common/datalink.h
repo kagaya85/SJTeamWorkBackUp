@@ -7,6 +7,7 @@
 
 struct TimerNode {
     clock_t nowTime,
+    frame_type ftype,
     seq_nr seq,
     TimerNode *next
 };
@@ -14,7 +15,6 @@ struct TimerNode {
 class Datalink {
 private:
     TimerNode *header;
-    TimerNode *ackHeader;
 public:
     Datalink();
     ~Datalink();
@@ -28,7 +28,6 @@ public:
     // signal
     void add_a_second(int signal);
     void timeout_handle(int signal);
-    void ack_timeout_handle(int signal);
 };
 
 #endif // DATALINK

@@ -4,7 +4,6 @@
 Datalink::Datalink()
 {
     header = NULL;
-    ackHeader = NULL;
 }
 
 Datalink::~Datalink()
@@ -15,12 +14,6 @@ Datalink::~Datalink()
         p = header->next;
         delete header;
         header = p;
-    }
-    while (ackHeader)
-    {
-        p = ackHeader->next;
-        delete ackHeader;
-        ackHeader = p;
     }
 }
 
@@ -38,6 +31,7 @@ void Datalink::start_timer(seq_nr k)
         }
         header->next = NULL;
         header->nowTime = TIMEOUT_LIMIT;
+        header->fkind = dataFrame;
         header->seq = k;
     }
     else
@@ -61,6 +55,7 @@ void Datalink::start_timer(seq_nr k)
         p = p->next;
         p->next = NULL;
         p->nowTime = t;
+        p->fkind = dataFrame;
         p->seq = k;
     }
 }
@@ -71,7 +66,7 @@ void Datalink::stop_timer(seq_nr k)
     if (!header)
         return;
 
-    if (header->seq == k)
+    if (header->seq == k && header->ftype == dataFrame)
     {
         p = header;
         header = header->next;
@@ -83,7 +78,7 @@ void Datalink::stop_timer(seq_nr k)
     q = header->next;
     while (q)
     {
-        if(q->seq == k)
+        if(q->seq == k && q->ftype == dataFrame)
         {
             p->next = q->next;
             delete q;
@@ -114,17 +109,77 @@ void Datalink::from_network_layer(packet *pkt)
 
 void Datalink::start_ack_timer()
 {
+    TimerNode *p;
+    clock_t t;
+    if (!ackHeader)
+    {
+        header = new(nothrow) TimerNode;
+        if (header == NULL)
+        {
+            cerr << "new timerNode error" << endl;
+            exit(EXIT_FAILURE);
+        }
+        header->next = NULL;
+        header->nowTime = TIMEOUT_LIMIT;
+        header->ftype = ackFrame;
+        header->seq = k;
+    }
+    else
+    {
+        p = header;
+        t = TIMEOUT_LIMIT
 
+        while (p->next)
+        {
+            t -= p->nowTime;
+            p = p->next;
+        }
+        t -= p->nowTime;
+
+        p->next = new(nothrow) TimerNode;
+        if (p == NULL)
+        {
+            cerr << "new timerNode error" << endl;
+            exit(EXIT_FAILURE);
+        }
+        p = p->next;
+        p->next = NULL;
+        p->nowTime = t;
+        p->ftype = ackFrame;
+        p->seq = k;
+    }
 }
 
 void Datalink::stop_ack_timer()
 {
+    TimerNode *p, *q;
+    if (!header)
+        return;
 
+    if (header->seq == k && header->ftype == ackFrame)
+    {
+        p = header;
+        header = header->next;
+        delete header;
+        return;
+    }
+
+    p = header;
+    q = header->next;
+    while (q)
+    {
+        if(q->seq == k && q->ftype == ackFrame)
+        {
+            p->next = q->next;
+            delete q;
+            q = p->next;
+            return;
+        }
+    }    
 }
 
-void Datalink::addSecond(int signal)
+void Datalink::add_a_second(int signal)
 {
-
 	alarm(1);
 	return;
 }
