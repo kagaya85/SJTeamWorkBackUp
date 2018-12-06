@@ -1,6 +1,4 @@
-#include "common.h"
 #include "Datalink.h"
-
 
 Datalink::Datalink()
 {
@@ -321,12 +319,67 @@ void Datalink::to_network_layer(packet *pkt)
     return 0;
 }
 
-void Datalink::from_physical_layer(packet *pkt)
+void Datalink::from_physical_layer(frame *frm)
 {
-    
+    int msgid = -1;
+    Message msg;
+
+    msgid = msgget(IPC_KEY, 0666 | IPC_CREAT);
+    if(msgid < 0) {
+        perror("Message get error");
+        exit(EXIT_FAILURE);
+    }
+
+    // 从队列读取
+    int ret;
+    do
+    {
+        errno = 0;
+        msgrcv(msgid, &msg, MSGBUFF_SIZE, FROM_PHYSICAL, 0)
+    } while (ret < 0 && errno == EINTR);
+
+    if (ret < 0)
+    {
+        perror("msgrcv failed");
+        exit(EXIT_FAILURE);
+    }
+
+    memcpy(&(frm->kind), msg.data, 4);
+    memcpy(&(frm->seq), &msg.data[4], 4);
+    memcpy(&(frm->ack), &msg.data[8], 4);
+    memcpy(frm->info, &msg.data[12], MAX_PKT);
+    return;
 }
 
-void Datalink::to_physical_layer(packet *pkt)
+void Datalink::to_physical_layer(frame *frm)
 {
+    int msgid = -1;
+    Message msg;
 
+    msgid = msgget(IPC_KEY, 0666 | IPC_CREAT);
+    if(msgid < 0) {
+        perror("Message get error");
+        exit(EXIT_FAILURE);
+    }
+
+    memcpy(msg.data, &(frm->kind), 4);
+    memcpy(&msg.data[4], &(frm->seq), 4);
+    memcpy(&msg.data[8], &(frm->ack), 4);
+    memcpy(&msg.data[12], frm->info, MAX_PKT);
+    msg.msg_type = FROM_DATALINK;
+    // 向队列发送
+    int ret;
+    do
+    {
+        errno = 0;
+        msgsnd(msgid, &msg, MSGBUFF_SIZE, 0)
+    } while (ret < 0 && errno == EINTR);
+
+    if (ret < 0)
+    {
+        perror("msgsnd failed");
+        exit(EXIT_FAILURE);
+    }
+
+    return;
 }

@@ -39,8 +39,8 @@ public:
     void seq_inc(seq_nr k);
     void from_network_layer(packet *pkt);    // -1异常 0正常
     void to_network_layer(packet *pkt);
-    void from_physical_layer(packet *pkt);
-    void to_physical_layer(packet *pkt);
+    void from_physical_layer(frame *frm);
+    void to_physical_layer(frame *frm);
 
     /* 信号处理函数 */
     void sigalarm_handle(int signal);
