@@ -17,6 +17,9 @@
 
 #define MAX_PKT 1024
 #define MSGBUFF_SIZE 1050
+#define IPC_KEY 114514
+#define FROM_PHYSICAL 1
+#define FROM_DATALINK 2
 #define inc(k) if(k<MAX_SEQ) k = k + 1; else k = 0;
 
 pid_t getPidByName(char *task_name);
@@ -46,11 +49,12 @@ typedef enum {
     Enable,
     Disable
 } layer_status;
+
 typedef struct {
-    frame_kind kind,
-    seq_nr  seq,
-    seq_nr  ack,
-    packet  info;
+    frame_kind kind,// 帧类型
+    seq_nr  seq,    // 发送序号
+    seq_nr  ack,    // 接受序号
+    packet  info;   // 数据
 } frame;
 
 struct Message {
