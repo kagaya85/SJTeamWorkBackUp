@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "cstdio": "cpp",
-        "cstdlib": "cpp"
+        "cstdlib": "cpp",
+        "string.h": "c"
     }
 }

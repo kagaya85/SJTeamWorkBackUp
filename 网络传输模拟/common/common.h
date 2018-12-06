@@ -3,14 +3,20 @@
 
 #include <signal.h>
 #include <unistd.h>
+#include <sys/types.h>
+#include <sys/ipc.h>
+#include <sys/msg.h>
+#include <errno.h>
+#include <stdlib.h>
 
 #define SIG_CHSUM_ERR (SIGRTMIN + 1)
 #define SIG_FRAME_ARRIVAL (SIGRTMIN + 2)
-#define SIG_NETWORK_LAYER_READY (SIGRTMIN + 3)
-#define SIG_NETWORK_LAYER_ENABLE (SIGRTMIN + 4)
-#define SIG_NETWORK_LAYER_DISABLE (SIGRTMIN + 5)
-#define MAX_PKT 1024
+#define SIG_NETWORKLAYER_READY (SIGRTMIN + 3)
+#define SIG_NETWORKLAYER_ENABLE (SIGRTMIN + 4)
+#define SIG_NETWORKLAYER_DISABLE (SIGRTMIN + 5)
 
+#define MAX_PKT 1024
+#define MSGBUFF_SIZE 1050
 #define inc(k) if(k<MAX_SEQ) k = k + 1; else k = 0;
 
 pid_t getPidByName(char *task_name);
@@ -46,5 +52,10 @@ typedef struct {
     seq_nr  ack,
     packet  info;
 } frame;
+
+struct Message {
+    long int msg_type;
+    unsigned char data[MSGBUFF_SIZE];
+};
 
 #endif // COMMON

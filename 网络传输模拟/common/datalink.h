@@ -1,7 +1,6 @@
 #ifndef DATALINK
 #define DATALINK
 
-#include <errno.h>
 #include <stdio.h>
 #include <time.h>
 #include "common.h"
@@ -23,7 +22,9 @@ private:
     TimerNode *header;
     event_type datalinkEvent;
     seq_nr NetworkDatalinkSeq;
-    seq_nr DatalinkPhysicalSeq;
+    // seq_nr DatalinkPhysicalSeq; // 链路层到物理层的发送序号
+    int arrivedPacketNum;    // 来自网络层已经到达的包数量
+    int arrivedFrameNum;    // 来自物理层已经到达的帧数量
     layer_status networkStatus;   // 网络层状态
 public:
     Datalink();
@@ -32,13 +33,19 @@ public:
     void stop_timer(seq_nr k);
     void enable_network_layer();
     void disable_network_layer();
-    int from_network_layer(packet *pkt);
     void start_ack_timer();
     void stop_ack_timer();
     void wait_for_event(event_type *event);
     void seq_inc(seq_nr k);
-    // signal
+    void from_network_layer(packet *pkt);    // -1异常 0正常
+    void to_network_layer(packet *pkt);
+    void from_physical_layer(packet *pkt);
+    void to_physical_layer(packet *pkt);
+
+    /* 信号处理函数 */
     void sigalarm_handle(int signal);
+    void sig_frame_arrival_handle(int signal);
+    void sig_networklayer_ready_handle(int signal);
 };
 
 #endif // DATALINK

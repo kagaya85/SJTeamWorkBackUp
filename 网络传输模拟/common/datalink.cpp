@@ -10,7 +10,12 @@ Datalink::Datalink()
     DatalinkPhysicalSeq = 0;
     networkStatus = Enable; // 默认网络层初始enable
     
+    // 设置信号处理函数
     signal(SIGALRM, Datalink::sigalarm_handle);     
+    signal(SIG_FRAME_ARRIVAL, Datalink::sig_frame_arrival_handle);     
+    signal(SIG_NETWORK_LAYER_READY, Datalink::sig_networklayer_ready_handle);     
+    
+    // 设置已毫秒为单位的闹钟
     struct itimerval new_value;    
     new_value.it_value.tv_sec = 0;    
     new_value.it_value.tv_usec = 1000;    
@@ -192,43 +197,6 @@ void Datalink::stop_ack_timer()
     }    
 }
 
-int Datalink::from_network_layer(packet *pkt)
-{
-    char fileName[50];
-    
-    if (networkStatus == Disable)
-    {
-        cerr << "network layer disabled" << endl;
-        return -1;
-    }
-    
-    sprintf(fileName, "network_datalink.share.%04d", frame_seq);
-    int fd = open(fileName);
-    if (fd < 0)
-    {
-        cerr << "open " << fileName << " error" << endl;
-        return -1;
-    }
-
-    flock(fd, LOCK_EX);
-
-    int ret;
-    do
-    {
-        errno = 0;
-        ret = read(fd, pkt.data, MAX_PKT);
-    } while (ret < 0 && errno == EINTR);
-
-    if (ret < 0)
-    {
-        cerr << "read " << fileName << " error: " << strerror(errno) << endl;
-        return -1;
-    }
-    
-    seq_inc(NetworkDatalinkSeq);
-    return 0;
-}
-
 void Datalink::wait_for_event(event_type *event)
 {
     pause();
@@ -244,6 +212,7 @@ void Datalink::seq_inc(seq_nr k)
         k = 0;
 }
 
+/* 信号处理函数 */
 void Datalink::sigalarm_handle(int signal)
 {
     if (!header)
@@ -267,4 +236,97 @@ void Datalink::sigalarm_handle(int signal)
     }
 
 	return;
+}
+
+void Datalink::sig_frame_arrival_handle(int signal)
+{
+    
+}
+
+void Datalink::sig_networklayer_ready_handle(int signal)
+{
+
+}
+
+/* 层交互函数 */
+void Datalink::from_network_layer(packet *pkt)
+{
+    char fileName[50];
+    
+    if (networkStatus == Disable)
+    {
+        cerr << "network layer disabled" << endl;
+        exit(EXIT_FAILURE);
+    }
+    
+    sprintf(fileName, "network_datalink.share.%04d", NetworkDatalinkSeq);
+    int fd = open(fileName, O_RDONLY);
+    if (fd < 0)
+    {
+        cerr << "open " << fileName << " error" << endl;
+        exit(EXIT_FAILURE);
+    }
+
+    flock(fd, LOCK_EX);
+
+    int ret;
+    do
+    {
+        errno = 0;
+        ret = read(fd, pkt.data, MAX_PKT);
+    } while (ret < 0 && errno == EINTR);
+
+    if (ret < 0)
+    {
+        cerr << "read " << fileName << " error: " << strerror(errno) << endl;
+        close(fd);
+        exit(EXIT_FAILURE);
+    }
+    
+    close(fd);
+    seq_inc(NetworkDatalinkSeq);
+    return; // ok
+}
+
+void Datalink::to_network_layer(packet *pkt)
+{
+    char fileName[50];
+    
+    sprintf(fileName, "network_datalink.share.%04d", NetworkDatalinkSeq);
+    int fd = open(fileName, O_WRONLY | O_CREAT);
+    if (fd < 0)
+    {
+        cerr << "open " << fileName << " error" << endl;
+        exit(EXIT_FAILURE);
+    }
+
+    flock(fd, LOCK_EX);
+
+    int ret;
+    do
+    {
+        errno = 0;
+        ret = write(fd, pkt.data, MAX_PKT);
+    } while (ret < 0 && errno == EINTR);
+
+    if (ret < 0)
+    {
+        cerr << "read " << fileName << " error: " << strerror(errno) << endl;
+        close(fd);
+        exit(EXIT_FAILURE);
+    }
+    
+    close(fd);
+    seq_inc(NetworkDatalinkSeq);
+    return 0;
+}
+
+void Datalink::from_physical_layer(packet *pkt)
+{
+    
+}
+
+void Datalink::to_physical_layer(packet *pkt)
+{
+
 }
