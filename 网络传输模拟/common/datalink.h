@@ -23,8 +23,8 @@ private:
     event_type datalinkEvent;
     seq_nr NetworkDatalinkSeq;
     // seq_nr DatalinkPhysicalSeq; // 链路层到物理层的发送序号
-    int arrivedPacketNum;    // 来自网络层已经到达的包数量
-    int arrivedFrameNum;    // 来自物理层已经到达的帧数量
+    unsigned int arrivedPacketNum;    // 来自网络层已经到达的包数量
+    unsigned int arrivedFrameNum;    // 来自物理层已经到达的帧数量
     layer_status networkStatus;   // 网络层状态
 public:
     Datalink();

@@ -5,13 +5,15 @@ Datalink::Datalink()
     header = NULL;
     datalinkEvent = no_event;
     NetworkDatalinkSeq = 0;
-    DatalinkPhysicalSeq = 0;
+    // DatalinkPhysicalSeq = 0;
+    arrivedPacketNum = 0;
+    arrivedFrameNum = 0;
     networkStatus = Enable; // 默认网络层初始enable
     
     // 设置信号处理函数
-    signal(SIGALRM, Datalink::sigalarm_handle);     
-    signal(SIG_FRAME_ARRIVAL, Datalink::sig_frame_arrival_handle);     
-    signal(SIG_NETWORK_LAYER_READY, Datalink::sig_networklayer_ready_handle);     
+    signal(SIGALRM, Datalink::sigalarm_handle);    
+    signal(SIG_FRAME_ARRIVAL, Datalink::sig_frame_arrival_handle);
+    signal(SIG_NETWORK_LAYER_READY, Datalink::sig_networklayer_ready_handle);
     
     // 设置已毫秒为单位的闹钟
     struct itimerval new_value;    
@@ -232,18 +234,22 @@ void Datalink::sigalarm_handle(int signal)
         header = header->next;
         delete p;
     }
-
-	return;
+    signal(SIGALRM, Datalink::sigalarm_handle);    
 }
 
 void Datalink::sig_frame_arrival_handle(int signal)
 {
-    
+    arrivedFrameNum++;
+    datalinkEvent = frame_arrival;
+    signal(SIG_FRAME_ARRIVAL, Datalink::sig_frame_arrival_handle);
 }
 
 void Datalink::sig_networklayer_ready_handle(int signal)
 {
-
+    arrivedPacketNum++;
+    datalinkEvent = network_layer_ready;
+    networkStatus = Enable;
+    signal(SIG_NETWORK_LAYER_READY, Datalink::sig_networklayer_ready_handle);    
 }
 
 /* 层交互函数 */
@@ -258,7 +264,14 @@ void Datalink::from_network_layer(packet *pkt)
     }
     
     sprintf(fileName, "network_datalink.share.%04d", NetworkDatalinkSeq);
-    int fd = open(fileName, O_RDONLY);
+    int fd;
+    
+    do
+    {
+        errno = 0;
+        fd = open(fileName, O_RDONLY);
+    } while (fd < 0 && errno = EINTR);
+    
     if (fd < 0)
     {
         cerr << "open " << fileName << " error" << endl;
@@ -291,7 +304,13 @@ void Datalink::to_network_layer(packet *pkt)
     char fileName[50];
     
     sprintf(fileName, "network_datalink.share.%04d", NetworkDatalinkSeq);
-    int fd = open(fileName, O_WRONLY | O_CREAT);
+    int fd;
+    do
+    {
+        errno = 0;
+        fd = open(fileName, O_WRONLY | O_CREAT);
+    } while (fd < 0 && errno = EINTR);
+
     if (fd < 0)
     {
         cerr << "open " << fileName << " error" << endl;
