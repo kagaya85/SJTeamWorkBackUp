@@ -4,7 +4,7 @@ Network::Network()
 {
     NetworkDatalinkSeq = 0;
     NetworkStatus = Enable;
-    /* 装载信坷 */
+    /* 装载信号 */
     signal(SIG_NETWORKLAYER_ENABLE, Network::sig_enable_handle);
 }
 

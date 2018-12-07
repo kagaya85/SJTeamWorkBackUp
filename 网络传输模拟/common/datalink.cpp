@@ -200,6 +200,7 @@ void Datalink::wait_for_event(event_type *event)
 {
     pause();
     *event = datalinkEvent;
+    
     return;
 }
 

@@ -48,3 +48,8 @@ pid_t getPidByName(char *task_name)
     pid = -1;
     return pid;
 }
+
+void packet::operator=(const packet &p)
+{
+    memcpy(data, p.data, MAX_PKT);
+}

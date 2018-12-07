@@ -26,14 +26,18 @@ pid_t getPidByName(char *task_name);
 
 typedef unsigned int seq_nr;    // 发送序号
 
-typedef strcut {
+class packet {
+public:
     unsigned char data[MAX_PKT];
-} packet;
+    // packet();
+    // ~packet();
+    void operator=(const packet &p);
+};
 
 typedef enum {
-    dataFrame,
-    ackFrame,
-    nakFrame
+    DataFrame,
+    AckFrame,
+    NakFrame
 } frame_type;
 
 typedef enum {

@@ -5,7 +5,7 @@ int main()
     Datalink dl;
     frame r;
     event_type event;
-
+    
     while(true)
     {
         wait_for_event(&event);
