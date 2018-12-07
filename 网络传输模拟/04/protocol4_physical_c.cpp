@@ -1,13 +1,10 @@
 #include <iostream>
-#include <stdio.h>
+#include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <errno.h>
 #include <string>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <sys/socket.h>
-#include <sys/wait.h>
+
+#include <errno.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <fcntl.h>
@@ -15,6 +12,11 @@
 #include <signal.h>
 #include <time.h>
 #include <dirent.h>
+
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/socket.h>
+#include <sys/wait.h>
 
 #include "../common/physical.h"
 #include "../common/common.h"

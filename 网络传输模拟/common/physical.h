@@ -1,5 +1,5 @@
-#ifndef COMMON_DATALINK // avoid multiple defination
-#define COMMON_DATALINK // avoid multiple defination
+#ifndef COMMON_DATALINK
+#define COMMON_DATALINK
 
 const int DatapackLen = 1036;
 const int NODatapackLen = 12;
@@ -38,4 +38,4 @@ unsigned int calc_bitstream(const char* const Bitstream, const int bitstream_len
 int read_bitstream(const int side, const int fd, const int buffer_len, char* const buffer);
 int write_bitstream(const int side, const int fd, const int buffer_len, const char* const buffer);
 
-#endif // avoid multiple defination
+#endif
