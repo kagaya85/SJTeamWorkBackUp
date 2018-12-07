@@ -8,7 +8,7 @@ Datalink::Datalink()
     // DatalinkPhysicalSeq = 0;
     arrivedPacketNum = 0;
     arrivedFrameNum = 0;
-    networkStatus = Enable; // 默认网络层初始enable
+    NetworkStatus = Enable; // 默认网络层初始enable
     
     // 设置信号处理函数
     signal(SIGALRM, Datalink::sigalarm_handle);    
@@ -113,7 +113,7 @@ void Datalink::enable_network_layer()
     pid_t pid;
     pid = getPidByName("network");
     kill(pid, SIG_NETWORKLAYER_ENABLE);
-    networkStatus = Enable;
+    NetworkStatus = Enable;
 }
 
 void Datalink::disable_network_layer()
@@ -121,11 +121,10 @@ void Datalink::disable_network_layer()
     pid_t pid;
     pid = getPidByName("network");
     kill(pid, SIG_NETWORKLAYER_DISABLE);
-    networkStatus = Disable;
+    NetworkStatus = Disable;
 }
 
 void Datalink::start_ack_timer()
-{
     TimerNode *p;
     clock_t t;
     if (!ackHeader)
@@ -213,7 +212,7 @@ void Datalink::seq_inc(seq_nr k)
 }
 
 /* 信号处理函数 */
-void Datalink::sigalarm_handle(int signal)
+static void Datalink::sigalarm_handle(int signal)
 {
     if (!header)
         return;
@@ -237,18 +236,18 @@ void Datalink::sigalarm_handle(int signal)
     signal(SIGALRM, Datalink::sigalarm_handle);    
 }
 
-void Datalink::sig_frame_arrival_handle(int signal)
+static void Datalink::sig_frame_arrival_handle(int signal)
 {
     arrivedFrameNum++;
     datalinkEvent = frame_arrival;
     signal(SIG_FRAME_ARRIVAL, Datalink::sig_frame_arrival_handle);
 }
 
-void Datalink::sig_network_layer_ready_handle(int signal)
+static void Datalink::sig_network_layer_ready_handle(int signal)
 {
     arrivedPacketNum++;
     datalinkEvent = network_layer_ready;
-    networkStatus = Enable;
+    NetworkStatus = Enable;
     signal(SIG_NETWORKLAYER_READY, Datalink::sig_networklayer_ready_handle);    
 }
 
@@ -257,7 +256,7 @@ void Datalink::from_network_layer(packet *pkt)
 {
     char fileName[50];
     
-    if (networkStatus == Disable)
+    if (NetworkStatus == Disable)
     {
         cerr << "network layer disabled" << endl;
         exit(EXIT_FAILURE);
@@ -328,14 +327,14 @@ void Datalink::to_network_layer(packet *pkt)
 
     if (ret < 0)
     {
-        cerr << "read " << fileName << " error: " << strerror(errno) << endl;
+        cerr << "write " << fileName << " error: " << strerror(errno) << endl;
         close(fd);
         exit(EXIT_FAILURE);
     }
     
     close(fd);
     seq_inc(NetworkDatalinkSeq);
-    return 0;
+    return;
 }
 
 void Datalink::from_physical_layer(frame *frm)
