@@ -22,6 +22,10 @@
 #define FROM_DATALINK 2
 #define inc(k) if(k<MAX_SEQ) k = k + 1; else k = 0;
 
+#define SENDER  1
+#define RECEIVER  0
+#define TaihouDaisuki 1
+
 pid_t getPidByName(char *task_name);
 
 typedef unsigned int seq_nr;    // 发送序号

@@ -1,0 +1,41 @@
+#ifndef COMMON_DATALINK // avoid multiple defination
+#define COMMON_DATALINK // avoid multiple defination
+
+const int DatapackLen = 1036;
+const int NODatapackLen = 12;
+const int FramkindLen = 4;
+const int SndNoLen = 4;
+const int RecvNoLen = 4;
+
+const unsigned int PureSIGpack = 0xFFFFFFFF;
+
+enum Link_State
+{
+    LINK_ERROR, LINK_OK
+};
+enum Socket_Exchange_State
+{
+    SOCKET_ERROR, SOCKET_CLOSE, SOCKET_OK
+};
+enum Read_State
+{
+    READ_ERROR, READ_CLOSE, READ_OK
+};
+enum Write_State
+{
+    WRITE_ERROR, WRITE_CLOSE, WRITE_OK
+};
+
+//----------Prework Part----------
+int get_pid_by_name(const char* const proc_name);
+//----------Msgqueue Part----------
+int link_to_DatalinkLayer(const int KEY);
+//----------Socket Part----------
+int data_exchange(const int side, const int pid, const int msgid, const int sockfd);
+
+unsigned int calc_bitstream(const char* const Bitstream, const int bitstream_length);
+
+int read_bitstream(const int side, const int fd, const int buffer_len, char* const buffer);
+int write_bitstream(const int side, const int fd, const int buffer_len, const char* const buffer);
+
+#endif // avoid multiple defination
