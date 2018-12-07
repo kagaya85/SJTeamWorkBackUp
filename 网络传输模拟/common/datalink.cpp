@@ -198,9 +198,11 @@ void Datalink::stop_ack_timer()
 
 void Datalink::wait_for_event(event_type *event)
 {
-    pause();
+    do
+    {
+        pause();
+    } while (datalinkEvent == no_event);
     *event = datalinkEvent;
-    
     return;
 }
 
@@ -234,6 +236,8 @@ static void Datalink::sigalarm_handle(int signal)
         header = header->next;
         delete p;
     }
+    else    // 未超时
+        datalinkEvent = no_event;
     signal(SIGALRM, Datalink::sigalarm_handle);    
 }
 

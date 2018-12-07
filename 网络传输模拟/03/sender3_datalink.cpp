@@ -28,7 +28,7 @@ int main()
                 inc(next_frame_to_send);
             }
             else
-                continue;
+                continue;   // 重发
         }
         else if (event == cksum_err)
         {

@@ -2,6 +2,7 @@
     "files.associations": {
         "cstdio": "cpp",
         "cstdlib": "cpp",
-        "string.h": "c"
+        "string.h": "c",
+        "xiosbase": "cpp"
     }
 }
