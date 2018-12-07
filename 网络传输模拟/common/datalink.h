@@ -19,12 +19,12 @@ struct TimerNode {
 
 class Datalink {
 private:
-    TimerNode *header;
-    event_type datalinkEvent;
-    seq_nr NetworkDatalinkSeq;
+    static TimerNode *header;
+    static event_type datalinkEvent;
+    static seq_nr NetworkDatalinkSeq;
     // seq_nr DatalinkPhysicalSeq; // 链路层到物理层的发送序号
-    unsigned int arrivedPacketNum;    // 来自网络层已经到达的包数量
-    unsigned int arrivedFrameNum;    // 来自物理层已经到达的帧数量
+    static unsigned int arrivedPacketNum;    // 来自网络层已经到达的包数量
+    static unsigned int arrivedFrameNum;    // 来自物理层已经到达的帧数量
     layer_status networkStatus;   // 网络层状态
 public:
     Datalink();
@@ -43,9 +43,9 @@ public:
     void to_physical_layer(frame *frm);
 
     /* 信号处理函数 */
-    void sigalarm_handle(int signal);
-    void sig_frame_arrival_handle(int signal);
-    void sig_networklayer_ready_handle(int signal);
+    static void sigalarm_handle(int signal);
+    static void sig_frame_arrival_handle(int signal);
+    static void sig_network_layer_ready_handle(int signal);
 };
 
 #endif // DATALINK

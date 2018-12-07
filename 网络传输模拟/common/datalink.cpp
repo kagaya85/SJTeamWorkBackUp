@@ -112,7 +112,7 @@ void Datalink::enable_network_layer()
 {
     pid_t pid;
     pid = getPidByName("network");
-    kill(pid, SIG_NETWORK_LAYER_ENABLE);
+    kill(pid, SIG_NETWORKLAYER_ENABLE);
     networkStatus = Enable;
 }
 
@@ -120,7 +120,7 @@ void Datalink::disable_network_layer()
 {
     pid_t pid;
     pid = getPidByName("network");
-    kill(pid, SIG_NETWORK_LAYER_DISABLE);
+    kill(pid, SIG_NETWORKLAYER_DISABLE);
     networkStatus = Disable;
 }
 
@@ -213,7 +213,7 @@ void Datalink::seq_inc(seq_nr k)
 }
 
 /* 信号处理函数 */
-void Datalink::sigalarm_handle(int signal)
+static void Datalink::sigalarm_handle(int signal)
 {
     if (!header)
         return;
@@ -237,19 +237,19 @@ void Datalink::sigalarm_handle(int signal)
     signal(SIGALRM, Datalink::sigalarm_handle);    
 }
 
-void Datalink::sig_frame_arrival_handle(int signal)
+static void Datalink::sig_frame_arrival_handle(int signal)
 {
     arrivedFrameNum++;
     datalinkEvent = frame_arrival;
     signal(SIG_FRAME_ARRIVAL, Datalink::sig_frame_arrival_handle);
 }
 
-void Datalink::sig_networklayer_ready_handle(int signal)
+static void Datalink::sig_network_layer_ready_handle(int signal)
 {
     arrivedPacketNum++;
     datalinkEvent = network_layer_ready;
     networkStatus = Enable;
-    signal(SIG_NETWORK_LAYER_READY, Datalink::sig_networklayer_ready_handle);    
+    signal(SIG_NETWORKLAYER_READY, Datalink::sig_networklayer_ready_handle);    
 }
 
 /* 层交互函数 */
