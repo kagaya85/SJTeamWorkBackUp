@@ -43,7 +43,7 @@ PHYSICAL-REC-SRC = receiver1_$(PHYSICAL-NAME).cpp
 PHYSICAL-SND-TARGET = sender1_$(PHYSICAL-NAME)
 PHYSICAL-REC-TARGET = receiver1_$(PHYSICAL-NAME)
 
-.PHONY: clean
+.PHONY: clean receiverrun senderrun
 	#avoid to make clean.*
 
 
@@ -77,3 +77,8 @@ clean:
 	 	  $(PHYSICAL-SND-TARGET) $(PHYSICAL-REC-TARGET) \
 		  *.o
 	$(RMRF) $(toDatalinkCache) $(toNetworkCache)
+
+receiverrun:
+    
+
+senderrun:

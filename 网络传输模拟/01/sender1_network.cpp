@@ -1,26 +1,17 @@
-#include <iostream>
-#include <fstream>
-#include <cstdio>
-#include <cstdlib>
-
-#include <errno.h>
-#include <fcntl.h>
-#include <string.h>
-#include <sys/param.h>
-#include <sys/stat.h>
-#include <sys/prctl.h>
-#include <sys/socket.h>
-#include <sys/select.h>
-#include <sys/time.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-
 #include "../common/network.h"
 
 using namespace std;
 
 int main(const int argc, const char* argv[])
 {
+    // 等待其他进程开启
+    pid_t pid = -1;
+    while(pid < 0)
+    {
+        sleep(1);
+        pid = getPidByName("datalink");
+    }
+    
     if(argc != 2)
 	{
 		printf("Usage:%s [send-filename]\n", argv[0]);

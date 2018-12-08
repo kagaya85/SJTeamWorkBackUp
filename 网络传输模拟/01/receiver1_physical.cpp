@@ -1,21 +1,3 @@
-#include <iostream>
-#include <cstdlib>
-#include <cstring>
-#include <string>
-
-#include <errno.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <signal.h>
-#include <dirent.h>
-
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <sys/socket.h>
-#include <sys/wait.h>
-
 #include "../common/physical.h"
 #include "../common/common.h"
 
@@ -25,6 +7,14 @@ int startup_server(int, const char*);
 
 int main(const int argc, char *argv[])
 {
+    // 等待其他进程开启
+    pid_t pid = -1;
+    while(pid < 0)
+    {
+        sleep(1);
+        pid = getPidByName("datalink");
+    }
+
 	if(argc != 2)
 	{
 		printf("Usage:%s [port]\n", argv[0]);

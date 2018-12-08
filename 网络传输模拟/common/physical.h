@@ -21,6 +21,7 @@
 #include <sys/socket.h>
 #include <sys/wait.h>
 #include <sys/msg.h>
+#include <iostream>
 
 const int DatapackLen = 1036;
 const int NODatapackLen = 12;
