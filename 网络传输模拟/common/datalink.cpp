@@ -257,10 +257,12 @@ void Datalink::sigalarm_handle(int signal)
         {
             datalinkEvent = timeout;
             timeoutSeq = header->seq;
+            cout << "Datalink: " << "seq "<< timeoutSeq <<" timeout" << endl;
         }
         else if (header->fkind == AckFrame)
         {
             datalinkEvent = ack_timeout;
+            cout << "Datalink: " << "ack timeout" << endl;
         }
         TimerNode *p;
         p = header;
