@@ -25,8 +25,10 @@ $(COMMON_DIR):
 $(DFS_DIR):
 	@for dir in $(dirs); \
 	do \
-		if [ "$$dir"x = "$(COMMON_DIR)"x ] \
-			continue \
+		if [ "$$dir"x = "$(COMMON_DIR)"x ]; \
+		then \
+			continue; \
+		fi; \
 		$(MAKE) -C $$dir all || exit 1; \
 	done
 	
