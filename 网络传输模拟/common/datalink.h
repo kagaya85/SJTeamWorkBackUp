@@ -3,6 +3,8 @@
 
 #include <stdio.h>
 #include <time.h>
+#include <dirent.h>
+
 #include "common.h"
 
 #define TIMEOUT_LIMIT 10000 // 单位ms 10s 

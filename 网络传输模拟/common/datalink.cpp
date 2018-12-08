@@ -285,7 +285,7 @@ void Datalink::from_network_layer(packet *pkt)
         exit(EXIT_FAILURE);
     }
     
-    sprintf(fileName, "network_datalink.share.%04d", NetworkDatalinkSeq);
+    sprintf(fileName, "%s/network_datalink.share.%04d", To_Datalink_Dir, NetworkDatalinkSeq);
     int fd;
         // 文件不存在循环等待
     while (access(fileName, F_OK) < 0)
@@ -328,7 +328,13 @@ void Datalink::to_network_layer(packet *pkt)
 {
     char fileName[50];
     
-    sprintf(fileName, "datalink_network.share.%04d", DatalinkNetworkSeq);
+    if (access(To_Network_Dir, F_OK) < 0)
+    {
+        mode_t mode = umask(0);
+        mkdir(To_Network_Dir, 0777);
+    }
+    
+    sprintf(fileName, "%s/datalink_network.share.%04d", To_Network_Dir, DatalinkNetworkSeq);
 
     int fd;
     do
