@@ -31,7 +31,7 @@ public:
 };
 
 
-
+//----------common function----------
 int isEndPacket(const packet &Packet);
 void RemovePAD(packet &Packet, int &len);
 

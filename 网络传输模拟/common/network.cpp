@@ -142,7 +142,7 @@ void Network::sig_disable_handle(int signal)
 }
 
 
-
+//----------common function----------
 int isEndPacket(const packet &Packet)
 {
     for(int i = 0; i < MAX_PKT; ++i)
