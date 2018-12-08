@@ -21,8 +21,8 @@ int link_to_DatalinkLayer(const int MSG_KEY)
     int msgid = msgget((key_t)MSG_KEY, 0666 | IPC_CREAT);
 	if(msgid == -1)
 	{
-		cerr << "Failed to link to Datalink Layer" << endl;
-        return LINK_ERROR;
+		cerr << "Failed to link to Datalink Layer: " << strerror(errno) << endl;
+        return -1;
 	}
     return msgid;
 }
@@ -107,6 +107,9 @@ int data_exchange(const int side, const int pid, const int msgid, const int sock
             }while(_snds == -1 && errno == EINTR);
             if (_snds == -1)
                 return TO_DATALINK_ERROR;
+
+            cout << (side == SENDER ? "SENDER " : "RECEIVER ");
+            cout << "Physical send to datalink layer" << endl;
 
             //send sig to DataLink_layer
             int SIG_OK;

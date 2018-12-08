@@ -31,10 +31,6 @@ const int RecvNoLen = 4;
 
 const unsigned int PureSIGpack = 0xFFFFFFFF;
 
-enum Link_State
-{
-    LINK_ERROR, LINK_OK
-};
 enum Socket_Exchange_State
 {
     SOCKET_ERROR, SOCKET_CLOSE, FROM_DATALINK_ERROR, TO_DATALINK_ERROR, SOCKET_OK

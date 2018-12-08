@@ -74,7 +74,7 @@ clean:
 	 	  $(DATALINK-SND-TARGET) $(DATALINK-REC-TARGET) \
 	 	  $(PHYSICAL-SND-TARGET) $(PHYSICAL-REC-TARGET) \
 		  *.o
-	$(RMRF) $(toDatalinkCache) $(toNetworkCache)
+	$(RMRF) $(DataLinkCacheDir) $(NetworkCacheDir)
 
 receiver:
 	./receiver1_datalink &
@@ -84,4 +84,4 @@ receiver:
 sender:
 	./sender1_datalink &
 	./sender1_network receiver1_datalink.cpp &
-	./sender1_physical 115.159.56.102 4000 &
+	./sender1_physical 192.168.137.64 4000 &
