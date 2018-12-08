@@ -21,15 +21,15 @@ pid_t getPidByName(const char * const task_name)
     dir = opendir("/proc"); 
     if (NULL != dir)
     {
-        while ((ptr = readdir(dir)) != NULL) //å¾ªçŽ¯è¯»å–/procä¸‹çš„æ¯ä¸€ä¸ªæ–‡ä»¶/æ–‡ä»¶å¤¹
+        while ((ptr = readdir(dir)) != NULL) //Ñ­»·¶ÁÈ¡/procÏÂµÄÃ¿Ò»¸öÎÄ¼þ/ÎÄ¼þ¼Ð
         {
-            //å¦‚æžœè¯»å–åˆ°çš„æ˜¯"."æˆ–è€…".."åˆ™è·³è¿‡ï¼Œè¯»å–åˆ°çš„ä¸æ˜¯æ–‡ä»¶å¤¹åå­—ä¹Ÿè·³è¿‡
+            //Èç¹û¶ÁÈ¡µ½µÄÊÇ"."»òÕß".."ÔòÌø¹ý£¬¶ÁÈ¡µ½µÄ²»ÊÇÎÄ¼þ¼ÐÃû×ÖÒ²Ìø¹ý
             if ((strcmp(ptr->d_name, ".") == 0) || (strcmp(ptr->d_name, "..") == 0))
                 continue;
             if (DT_DIR != ptr->d_type)
                 continue;
         
-            sprintf(filepath, "/proc/%s/status", ptr->d_name);//ç”Ÿæˆè¦è¯»å–çš„æ–‡ä»¶çš„è·¯å¾„
+            sprintf(filepath, "/proc/%s/status", ptr->d_name);//Éú³ÉÒª¶ÁÈ¡µÄÎÄ¼þµÄÂ·¾¶
             fp = fopen(filepath, "r");
             if (NULL != fp)
             {
@@ -39,7 +39,7 @@ pid_t getPidByName(const char * const task_name)
                 }
                 sscanf(buf, "%*s %s", cur_task_name);
 
-                //å¦‚æžœæ–‡ä»¶å†…å®¹æ»¡è¶³è¦æ±‚åˆ™æ‰“å°è·¯å¾„çš„åå­—ï¼ˆå³è¿›ç¨‹çš„PIDï¼‰
+                //Èç¹ûÎÄ¼þÄÚÈÝÂú×ãÒªÇóÔò´òÓ¡Â·¾¶µÄÃû×Ö£¨¼´½ø³ÌµÄPID£©
                 if (!strcmp(task_name, cur_task_name)){
                     pid = atoi(ptr->d_name);
                     // sscanf(ptr->d_name, "%d", pid);

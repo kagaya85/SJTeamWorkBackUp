@@ -2,8 +2,8 @@
 
 TimerNode *header;
 event_type datalinkEvent;
-unsigned int arrivedPacketNum;    // æ¥è‡ªç½‘ç»œå±‚å·²ç»åˆ°è¾¾çš„åŒ…æ•°é‡
-unsigned int arrivedFrameNum;    // æ¥è‡ªç‰©ç†å±‚å·²ç»åˆ°è¾¾çš„å¸§æ•°é‡
+unsigned int arrivedPacketNum;    // À´×ÔÍøÂç²ãÒÑ¾­µ½´ïµÄ°üÊıÁ¿
+unsigned int arrivedFrameNum;    // À´×ÔÎïÀí²ãÒÑ¾­µ½´ïµÄÖ¡ÊıÁ¿
 seq_nr timeoutSeq;
 
 Datalink::Datalink()
@@ -15,14 +15,14 @@ Datalink::Datalink()
     DatalinkNetworkSeq = 0;
     arrivedPacketNum = 0;
     arrivedFrameNum = 0;
-    NetworkStatus = Enable; // é»˜è®¤ç½‘ç»œå±‚åˆå§‹enable
+    NetworkStatus = Enable; // Ä¬ÈÏÍøÂç²ã³õÊ¼enable
     
-    // è®¾ç½®ä¿¡å·å¤„ç†å‡½æ•°
+    // ÉèÖÃĞÅºÅ´¦Àíº¯Êı
     signal(SIGALRM, Datalink::sigalarm_handle);    
     signal(SIG_FRAME_ARRIVAL, Datalink::sig_frame_arrival_handle);
     signal(SIG_NETWORK_LAYER_READY, Datalink::sig_networklayer_ready_handle);
     
-    // è®¾ç½®å·²æ¯«ç§’ä¸ºå•ä½çš„é—¹é’Ÿ
+    // ÉèÖÃÒÑºÁÃëÎªµ¥Î»µÄÄÖÖÓ
     struct itimerval new_value;    
     new_value.it_value.tv_sec = 0;    
     new_value.it_value.tv_usec = 1000;    
@@ -30,7 +30,7 @@ Datalink::Datalink()
     new_value.it_interval.tv_usec = 1000;
     setitimer(ITIMER_REAL, &new_value, NULL);
 
-    // å»ºç«‹æ¶ˆæ¯é˜Ÿåˆ—
+    // ½¨Á¢ÏûÏ¢¶ÓÁĞ
     msgid = msgget(IPC_KEY, 0666 | IPC_CREAT);
     if (msgid < 0)
     {
@@ -213,7 +213,7 @@ void Datalink::stop_ack_timer()
 
 void Datalink::wait_for_event(event_type *event)
 {
-    if(*event != datalinkEvent) // åœ¨wait_for_eventä¹‹å¤–æœ‰ä¿¡å·ä¸­æ–­
+    if(*event != datalinkEvent) // ÔÚwait_for_eventÖ®ÍâÓĞĞÅºÅÖĞ¶Ï
     {
         *event = datalinkEvent;
         return;
@@ -234,7 +234,7 @@ void Datalink::seq_inc(seq_nr k)
         k = 0;
 }
 
-/* ä¿¡å·å¤„ç†å‡½æ•° */
+/* ĞÅºÅ´¦Àíº¯Êı */
 static void Datalink::sigalarm_handle(int signal)
 {
     if (!header)
@@ -257,7 +257,7 @@ static void Datalink::sigalarm_handle(int signal)
         header = header->next;
         delete p;
     }
-    else    // æœªè¶…æ—¶
+    else    // Î´³¬Ê±
         datalinkEvent = no_event;
     signal(SIGALRM, Datalink::sigalarm_handle);    
 }
@@ -282,7 +282,7 @@ seq_nr Datalink::get_timeout_seq()
     return timeoutSeq;
 }
 
-/* å±‚äº¤äº’å‡½æ•° */
+/* ²ã½»»¥º¯Êı */
 void Datalink::from_network_layer(packet *pkt)
 {
     char fileName[50];
@@ -295,7 +295,7 @@ void Datalink::from_network_layer(packet *pkt)
     
     sprintf(fileName, "%s/network_datalink.share.%04d", To_Datalink_Dir, NetworkDatalinkSeq);
     int fd;
-        // æ–‡ä»¶ä¸å­˜åœ¨å¾ªç¯ç­‰å¾…
+        // ÎÄ¼ş²»´æÔÚÑ­»·µÈ´ı
     while (access(fileName, F_OK) < 0)
         sleep(1);
         
@@ -382,7 +382,7 @@ void Datalink::from_physical_layer(frame *frm)
 {
     Message msg;
 
-    // ä»é˜Ÿåˆ—è¯»å–
+    // ´Ó¶ÓÁĞ¶ÁÈ¡
     int ret;
     do
     {
@@ -420,7 +420,7 @@ void Datalink::to_physical_layer(frame *frm)
     memcpy(&msg.data[8], &(frm->ack), 4);
     memcpy(&msg.data[12], frm->info, MAX_PKT);
     msg.msg_type = FROM_DATALINK;
-    // å‘é˜Ÿåˆ—å‘é€
+    // Ïò¶ÓÁĞ·¢ËÍ
     int ret;
     do
     {
