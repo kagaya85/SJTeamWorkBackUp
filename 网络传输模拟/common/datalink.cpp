@@ -2,12 +2,12 @@
 
 using namespace std;
 
-TimerNode *header;
-event_type datalinkEvent;
-unsigned int arrivedPacketNum;    // 来自网络层已经到达的包数量
-unsigned int arrivedFrameNum;    // 来自物理层已经到达的帧数量
-seq_nr timeoutSeq;
-layer_status NetworkStatus;
+TimerNode * Datalink::header;
+event_type Datalink::datalinkEvent;
+unsigned int Datalink::arrivedPacketNum;    // 来自网络层已经到达的包数量
+unsigned int Datalink::arrivedFrameNum;    // 来自物理层已经到达的帧数量
+seq_nr Datalink::timeoutSeq;
+layer_status Datalink::NetworkStatus;
 
 Datalink::Datalink()
 {

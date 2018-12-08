@@ -1,5 +1,26 @@
-#ifndef COMMON_DATALINK
-#define COMMON_DATALINK
+#ifndef PHYSICAL
+#define PHYSICAL
+#include "common.h"
+#include <iostream>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <string>
+
+#include <errno.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <signal.h>
+#include <time.h>
+#include <dirent.h>
+
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/socket.h>
+#include <sys/wait.h>
+#include <sys/msg.h>
 
 const int DatapackLen = 1036;
 const int NODatapackLen = 12;
