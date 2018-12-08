@@ -140,3 +140,30 @@ void Network::sig_disable_handle(int signal)
 {
     NetworkStatus = Disable;
 }
+
+
+
+int isEndPacket(const packet &Packet)
+{
+    for(int i = 0; i < MAX_PKT; ++i)
+        if(Packet.data[i] != '\0')
+            return 0;
+    return 1;
+}
+void RemovePAD(packet &Packet, int &len)
+{
+    for(int i = MAX_PKT - 1; i; --i)
+    {
+        if(Packet.data[i] == PADbyte)
+            --len;
+        else
+            break;
+    }
+    return;
+}
+
+void FillPAD(unsigned char * const Packet, const int startPosition)
+{
+    for(int i = startPosition; i < MAX_PKT; ++i)
+        Packet[i] = PADbyte;
+}

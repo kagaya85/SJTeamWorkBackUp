@@ -30,4 +30,11 @@ public:
     static void sig_disable_handle(int signal);
 };
 
+
+
+int isEndPacket(const packet &Packet);
+void RemovePAD(packet &Packet, int &len);
+
+void FillPAD(unsigned char * const Packet, const int startPosition)；
+
 #endif // NETWORK
