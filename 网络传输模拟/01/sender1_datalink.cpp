@@ -21,10 +21,10 @@ int main()
 
     while(true)
     {
-        cout << "datalink read from network" << endl;
+        // cout << "datalink read from network" << endl;
         dl.from_network_layer(&buffer);
         s.info = buffer;
-        cout << "datalink write to physical" << endl;
+        // cout << "datalink write to physical" << endl;
         dl.to_physical_layer(&s);
     }
 

@@ -23,7 +23,7 @@ int main(const int argc, char *argv[])
 
 	int DatalinkLayer_pid = get_pid_by_name("receiver1_datalink");  // here use the datalink proc_name
 	int DatalinkLayer_msgid = link_to_DatalinkLayer(IPC_KEY);
-	if(DatalinkLayer_msgid == LINK_ERROR)
+	if(DatalinkLayer_msgid == -1)
 	{
 		cerr << "Failed to Link to Datalink Layer" << endl;
 		return -1;
