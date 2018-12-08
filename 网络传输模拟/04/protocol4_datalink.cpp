@@ -8,6 +8,7 @@ int main()
     seq_nr next_frame_to_send;
     seq_nr frame_expected;
     frame r, s;
+    packet buffer;
     event_type event;
 
     next_frame_to_send = 0;

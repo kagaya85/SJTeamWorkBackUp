@@ -269,7 +269,10 @@ void Datalink::from_network_layer(packet *pkt)
     
     sprintf(fileName, "network_datalink.share.%04d", NetworkDatalinkSeq);
     int fd;
-    
+        // 文件不存在循环等待
+    while (access(fileName, F_OK) < 0)
+        sleep(1);
+        
     do
     {
         errno = 0;
@@ -405,4 +408,22 @@ void Datalink::to_physical_layer(frame *frm)
     }
 
     return;
+}
+
+static bool Datalink::between(seq_nr a, seq_nr b, seq_nr c)
+{
+    if(((a <= b) && (b < c)) || ((c < a) && (a <= b)) || ((b < c) && (c < a)))
+        return true;
+    else
+        return false;
+}
+
+void send_data(seq_nr frame_nr, seq_nr frame_expected, packet buffer[])
+{
+    frame s;
+    s.info = buffer[frame_nr];
+    s.seq = frame_nr;
+    s.ack = (frame_expected + MAX_SEQ) % (MAX_SEQ + 1);
+    to_physical_layer(&s);
+    start_timer(frame_nr);
 }

@@ -42,7 +42,7 @@ typedef enum {
     DataFrame,
     AckFrame,
     NakFrame
-} frame_type;
+} frame_kind;
 
 typedef enum {
     no_event,

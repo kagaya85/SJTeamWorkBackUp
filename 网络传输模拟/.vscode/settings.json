@@ -4,6 +4,6 @@
         "cstdlib": "cpp",
         "string.h": "c",
         "xiosbase": "cpp",
-        "iosfwd": "cpp"
+        "ostream": "cpp"
     }
 }

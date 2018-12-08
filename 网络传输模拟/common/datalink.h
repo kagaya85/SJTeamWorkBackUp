@@ -41,7 +41,8 @@ public:
     void to_network_layer(packet *pkt);
     void from_physical_layer(frame *frm);
     void to_physical_layer(frame *frm);
-
+    void send_data(seq_nr frame_nr, seq_nr frame_expected, packet bufferp[]);
+    static bool between(seq_nr a, seq_nr b, seq_nr c);
     /* 信号处理函数 */
     static void sigalarm_handle(int signal);
     static void sig_frame_arrival_handle(int signal);
