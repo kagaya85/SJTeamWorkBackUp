@@ -336,7 +336,7 @@ void Datalink::from_network_layer(packet *pkt)
         exit(EXIT_FAILURE);
     }
     
-    cout << "Datalink: " << "read " << ret << " byte(s) from network layer" << endl;
+    cout << "Datalink: " << "read " << ret << " byte(s) from "<< fileName << endl;
     close(fd);
     seq_inc(NetworkDatalinkSeq);
     return; // ok
@@ -382,7 +382,7 @@ void Datalink::to_network_layer(packet *pkt)
         close(fd);
         exit(EXIT_FAILURE);
     }
-    cout << "Datalink: " << "write " << ret << " byte(s) to network layer" << endl;
+    cout << "Datalink: " << "write " << ret << " byte(s) to "<< fileName << endl;
     
     close(fd);
     seq_inc(DatalinkNetworkSeq);
