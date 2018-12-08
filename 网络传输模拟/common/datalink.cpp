@@ -96,6 +96,7 @@ void Datalink::start_timer(seq_nr k)
         p->fkind = DataFrame;
         p->seq = k;
     }
+    cout << "Datalink: " << "start timer seq " << k << endl;
 }
 
 void Datalink::stop_timer(seq_nr k)
@@ -123,7 +124,8 @@ void Datalink::stop_timer(seq_nr k)
             q = p->next;
             return;
         }
-    }    
+    }
+    cout << "Datalink: " << "stop timer seq " << k << endl;
 }
 
 void Datalink::enable_network_layer()
@@ -132,6 +134,7 @@ void Datalink::enable_network_layer()
     pid = getPidByName("network");
     kill(pid, SIG_NETWORKLAYER_ENABLE);
     NetworkStatus = Enable;
+    cout << "Datalink: " << "enable network layer" << endl;
 }
 
 void Datalink::disable_network_layer()
@@ -140,6 +143,7 @@ void Datalink::disable_network_layer()
     pid = getPidByName("network");
     kill(pid, SIG_NETWORKLAYER_DISABLE);
     NetworkStatus = Disable;
+    cout << "Datalink: " << "disable network layer" << endl;
 }
 
 void Datalink::start_ack_timer()
@@ -183,6 +187,7 @@ void Datalink::start_ack_timer()
         p->nowTime = t;
         p->fkind = AckFrame;
     }
+    cout << "Datalink: " << "start ack timer" << endl;
 }
 
 void Datalink::stop_ack_timer()
@@ -210,11 +215,14 @@ void Datalink::stop_ack_timer()
             q = p->next;
             return;
         }
-    }    
+    }
+    cout << "Datalink: " << "stop ack timer" << endl;
 }
 
 void Datalink::wait_for_event(event_type *event)
 {
+    cout << "Datalink: " << "wait for event" << endl;
+    
     if(*event != datalinkEvent) // 在wait_for_event之外有信号中断
     {
         *event = datalinkEvent;
@@ -267,6 +275,7 @@ void Datalink::sig_frame_arrival_handle(int signal)
 {
     arrivedFrameNum++;
     datalinkEvent = frame_arrival;
+    cout << "Datalink: get signal SIG_FRAME_ARRIVAL" << endl;
 }
 
 void Datalink::sig_network_layer_ready_handle(int signal)
@@ -274,6 +283,7 @@ void Datalink::sig_network_layer_ready_handle(int signal)
     arrivedPacketNum++;
     datalinkEvent = network_layer_ready;
     NetworkStatus = Enable;
+    cout << "Datalink: get signal SIG_NETWORKLAYER_READY" << endl;
 }
 
 seq_nr Datalink::get_timeout_seq()
@@ -326,6 +336,7 @@ void Datalink::from_network_layer(packet *pkt)
         exit(EXIT_FAILURE);
     }
     
+    cout << "Datalink: " << "read " << ret << " byte(s) from network layer" << endl;
     close(fd);
     seq_inc(NetworkDatalinkSeq);
     return; // ok
@@ -371,6 +382,7 @@ void Datalink::to_network_layer(packet *pkt)
         close(fd);
         exit(EXIT_FAILURE);
     }
+    cout << "Datalink: " << "write " << ret << " byte(s) to network layer" << endl;
     
     close(fd);
     seq_inc(DatalinkNetworkSeq);
@@ -394,6 +406,8 @@ void Datalink::from_physical_layer(frame *frm)
         perror("msgrcv failed");
         exit(EXIT_FAILURE);
     }
+
+    cout << "Datalink: " << "receive frame from physical layer" << endl;
 
     int tmpkind;
     memcpy(&tmpkind, msg.data, 4);
@@ -434,6 +448,8 @@ void Datalink::to_physical_layer(frame *frm)
         perror("msgsnd failed");
         exit(EXIT_FAILURE);
     }
+
+    cout << "Datalink: " << "send frame to physical layer" << endl;
 
     return;
 }
