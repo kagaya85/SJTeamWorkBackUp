@@ -79,13 +79,18 @@ void Network::to_datalink_layer(packet *pkt)
     return;
 }
 
-void Network::from_datalink_layer(packet *pkt)
+int Network::from_datalink_layer(packet *pkt)
 {
     char fileName[50];
     
     sprintf(fileName, "datalink_network.share.%04d", DatalinkNetworkSeq);
     
     int fd;
+    
+    // 文件不存在 返回-1
+    while (access(fileName, F_OK) < 0)
+        return -1
+
     do
     {
         errno = 0;
@@ -116,7 +121,7 @@ void Network::from_datalink_layer(packet *pkt)
     
     close(fd);
     seq_inc(DatalinkNetworkSeq);
-    return;
+    return 0;
 }
 
 void Network::network_layer_ready()

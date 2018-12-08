@@ -330,7 +330,6 @@ void Datalink::to_network_layer(packet *pkt)
     
     sprintf(fileName, "datalink_network.share.%04d", DatalinkNetworkSeq);
 
-
     int fd;
     do
     {
