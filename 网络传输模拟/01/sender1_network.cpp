@@ -3,6 +3,7 @@
 #include <cstdio>
 #include <cstdlib>
 
+#include <errno.h>
 #include <fcntl.h>
 #include <string.h>
 #include <sys/param.h>
@@ -14,12 +15,11 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
-#include "../common/common.h"
 #include "../common/network.h"
 
 using namespace std;
 
-void FillPAD(packet &Packet, const int startPostition);
+void FillPAD(unsigned char * const Packet, const int startPosition);
 
 int main(const int argc, const char* argv[])
 {
@@ -29,7 +29,7 @@ int main(const int argc, const char* argv[])
 		return 1;
 	}
 
-    ifstream fin(argv[1], ios::read | ios::binary | ios::nocreate);
+    ifstream fin(argv[1], ios::in | ios::binary);
     if(!fin.is_open())
     {
         cerr << "File open failed: " << strerror(errno) << endl;
@@ -44,7 +44,7 @@ int main(const int argc, const char* argv[])
 
     while(TaihouDaisuki)
     {
-        if(NetworkLayer.state() == Disable)
+        if(NetworkLayer.status() == Disable)
         {
             unsigned int LastSec = 1000000;
             while(LastSec)
@@ -54,27 +54,27 @@ int main(const int argc, const char* argv[])
 
         if(EndPackFlag) // send EndPacket
         {
-            memcpy(Pocket.data, EndPacket, MAX_PKT);
-            NetworkLayer.to_datalink_layer(&Packet, MAX_PKT);
+            memcpy(Packet.data, EndPacket, MAX_PKT);
+            NetworkLayer.to_datalink_layer(&Packet);
             break;
         }
 
-        fin.read(FileBuffer, MAX_PKT);
+        fin.read((char *)FileBuffer, MAX_PKT);
         bufferLen = fin.gcount();
         if(bufferLen < MAX_PKT) //file read finish
         {
             if(bufferLen) // not single EOF
             {
-                FillPAD(FileBuffer);
+                FillPAD(FileBuffer, bufferLen);
                 memcpy(Packet.data, FileBuffer, MAX_PKT);
-                NetworkLayer.to_datalink_layer(&Packet, MAX_PKT);
+                NetworkLayer.to_datalink_layer(&Packet);
                 
                 EndPackFlag = 1; // Next Round Sned EndPacket
             }
             else // single EOF, send EndPacket
             {
-                memcpy(Pocket.data, EndPacket, MAX_PKT);
-                NetworkLayer.to_datalink_layer(&Packet, MAX_PKT);
+                memcpy(Packet.data, EndPacket, MAX_PKT);
+                NetworkLayer.to_datalink_layer(&Packet);
                 break;
             }   
         }
@@ -90,8 +90,8 @@ int main(const int argc, const char* argv[])
     return 0;
 }
 
-void FillPAD(packet &Packet, const int startPostition)
+void FillPAD(unsigned char * const Packet, const int startPosition)
 {
     for(int i = startPosition; i < MAX_PKT; ++i)
-        Packet.data[i] = PADbyte;
+        Packet[i] = PADbyte;
 }

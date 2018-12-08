@@ -1,4 +1,18 @@
+#include <iostream>
+#include <cstdio>
+
+#include <string.h>
+#include <errno.h>
+#include <fcntl.h>
+
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/file.h>
+
 #include "network.h"
+
+seq_nr Network::NetworkDatalinkSeq;
+layer_status Network::NetworkStatus;
 
 Network::Network()
 {
@@ -28,12 +42,17 @@ layer_status Network::status()
 
 void Network::to_datalink_layer(packet *pkt)
 {
+    char fileName[50];
+
+    sprintf(fileName, "network_datalink.share.%04d", NetworkDatalinkSeq);
+    
+
     int fd;
     do
     {
         errno = 0;
-        fd = open(filename, O_WRONLY | O_CREAT);
-    } while (fd < 0 && errno == EINTR)
+        fd = open(fileName, O_WRONLY | O_CREAT);
+    } while (fd < 0 && errno == EINTR);
 
     if (fd < 0)
     {
@@ -46,7 +65,7 @@ void Network::to_datalink_layer(packet *pkt)
     do
     {
         errno = 0;
-        ret = write(fd, pkt.data, MAX_PKT);
+        ret = write(fd, pkt->data, MAX_PKT);
     } while (ret < 0 && errno == EINTR);
 
     if (ret < 0)
@@ -67,15 +86,11 @@ void Network::from_datalink_layer(packet *pkt)
     
     sprintf(fileName, "network_datalink.share.%04d", NetworkDatalinkSeq);
     
-    // 文件不存在循环等待
-    while (access(fileName, F_OK) < 0)
-        sleep(1);
-
     int fd;
     do
     {
         errno = 0;
-        fd = open(filename, O_RDONLY);
+        fd = open(fileName, O_RDONLY);
     } while (fd < 0 && errno == EINTR);
 
     if (fd < 0)
@@ -90,7 +105,7 @@ void Network::from_datalink_layer(packet *pkt)
     do
     {
         errno = 0;
-        ret = read(fd, pkt.data, MAX_PKT);
+        ret = read(fd, pkt->data, MAX_PKT);
     } while (ret < 0 && errno == EINTR);
 
     if (ret < 0)
@@ -112,13 +127,12 @@ void Network::network_layer_ready()
     kill(pid, SIG_NETWORKLAYER_READY);
 }
 
-static void Network::sig_enable_handle(int signal)
+void Network::sig_enable_handle(int signal)
 {
     NetworkStatus = Enable;
 }
 
-static void Network::sig_disable_handle(int signal)
+void Network::sig_disable_handle(int signal)
 {
     NetworkStatus = Disable;
 }
-

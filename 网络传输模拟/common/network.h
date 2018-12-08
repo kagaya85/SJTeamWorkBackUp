@@ -3,7 +3,9 @@
 
 #define PADbyte 0
 
+#include <unistd.h>
 #include <cstdlib>
+
 #include "common.h"
 
 using namespace std;
@@ -26,4 +28,5 @@ public:
     static void sig_enable_handle(int signal);
     static void sig_disable_handle(int signal);
 };
+
 #endif // NETWORK

@@ -2,9 +2,14 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <dirent.h>
+#include <string.h>
 
-pid_t getPidByName(char *task_name)
+#include "common.h"
+
+pid_t getPidByName(const char * const task_name)
 {
+    const int BUF_SIZE = 1024;
+
     DIR *dir;
     pid_t pid;
     struct dirent *ptr;

@@ -3,6 +3,7 @@
 #include <cstdio>
 #include <cstdlib>
 
+#include <errno.h>
 #include <fcntl.h>
 #include <string.h>
 #include <sys/param.h>
@@ -14,7 +15,6 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
-#include "../common/common.h"
 #include "../common/network.h"
 
 using namespace std;
@@ -40,7 +40,7 @@ int main(const int argc, const char* argv[])
     Network NetworkLayer;
     packet Lastpacket, Curpacket;
     int packetLen;
-    memset(Lastpacket.data(), 0, MAX_PKT);
+    memset(Lastpacket.data, 0, MAX_PKT);
 
     while(TaihouDaisuki)
     {
@@ -50,13 +50,13 @@ int main(const int argc, const char* argv[])
             //write last packet into file
             int LastPackLen = MAX_PKT;
             RemovePAD(Lastpacket, LastPackLen);
-            fout.write(Lastpacket.data, LastPackLen);
+            fout.write((char *)Lastpacket.data, LastPackLen);
             break;
         }
         else
         {
             if(!isEndPacket(Lastpacket))
-                fout.write(Lastpacket.data, MAX_PKT);
+                fout.write((char *)Lastpacket.data, MAX_PKT);
             Lastpacket = Curpacket;
         }
     }
