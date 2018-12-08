@@ -236,7 +236,7 @@ void Datalink::wait_for_event(event_type *event)
     return;
 }
 
-void Datalink::seq_inc(seq_nr k)
+void Datalink::seq_inc(seq_nr &k)
 {
     if(k < MAX_SHARE_SEQ) 
         k = k + 1; 

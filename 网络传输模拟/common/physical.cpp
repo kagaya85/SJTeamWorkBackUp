@@ -40,7 +40,6 @@ int data_exchange(const int side, const int pid, const int msgid, const int sock
 
     struct Message msg_data;
 
-    cout << "Taihou = " << TaihouDaisuki << endl;
     while(TaihouDaisuki)
     {
         readfds = sockfds;
@@ -149,6 +148,9 @@ int data_exchange(const int side, const int pid, const int msgid, const int sock
                     return SOCKET_CLOSE;
                 else if (write_res == WRITE_ERROR)
                     return WRITE_ERROR;
+                
+                cout << (side == SENDER ? "SENDER " : "RECEIVER ");
+                cout << "Physical receive from datalink layer" << endl;
             }
         }
     }
@@ -167,7 +169,7 @@ int read_bitstream(const int side, const int fd, const int Len, char* const buff
         buffer_p += (_rs > 0 ? _rs : 0);
         if(buffer_p == Len)
             break;
-    } while (_rs < 0 && (errno == EINTR || errno == EWOULDBLOCK || errno == EAGAIN));
+    } while ((_rs < 0 && (errno == EINTR || errno == EWOULDBLOCK || errno == EAGAIN)) || (buffer_p < Len));
 
     if(_rs == 0)
         return READ_CLOSE;
@@ -190,7 +192,7 @@ int write_bitstream(const int side, const int fd, const int Len, const char* con
         buffer_p += (_ws > 0 ? _ws : 0);
         if(buffer_p == Len)
             break;
-    } while(_ws < 0 && (errno == EINTR || errno == EWOULDBLOCK || errno == EAGAIN));
+    } while((_ws < 0 && (errno == EINTR || errno == EWOULDBLOCK || errno == EAGAIN)) || (buffer_p < Len));
 
     if(_ws == 0)
         return WRITE_CLOSE;

@@ -47,7 +47,7 @@ public:
     void start_ack_timer();
     void stop_ack_timer();
     void wait_for_event(event_type *event);
-    void seq_inc(seq_nr k);
+    void seq_inc(seq_nr &k);
     void from_network_layer(packet *pkt);    // -1Òì³£ 0Õý³£
     void to_network_layer(packet *pkt);
     void from_physical_layer(frame *frm);

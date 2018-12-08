@@ -33,7 +33,7 @@ private:
 public:
     Network();
     ~Network();
-    void seq_inc(seq_nr k);
+    void seq_inc(seq_nr &k);
     layer_status status();
     void to_datalink_layer(packet *pkt);
     int from_datalink_layer(packet *pkt);
