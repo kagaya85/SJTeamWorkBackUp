@@ -6,18 +6,19 @@ int main()
 {
     Datalink dl;
     seq_nr next_frame_to_send;
+    seq_nr ack_expected;
     seq_nr frame_expected;
-    frame r, s;
+    frame r;
+    packet buffer[MAX_SEQ + 1];
+    seq_nr nbuffered;
+    seq_nr i;
     event_type event;
 
+    dl.enable_network_layer();
+    ack_expected = 0;
     next_frame_to_send = 0;
     frame_expected = 0;
-    from_network_layer(&buffer);
-    s.info = buffer;
-    s.seq = next_frame_to_send;
-    s.ack = 1 - frame_expected;
-    dl.to_physical_layer(&s);
-    dl.start_timer(s.seq);
+    nbuffered = 0;
 
     while(true)
     {
@@ -25,6 +26,10 @@ int main()
         switch(event)
         {
             case network_layer_ready:
+                dl.from_network_layer(&buffer[next_frame_to_send]);
+                nbuffered++;
+                dl.send_data(next_frame_to_send, frame_expected, buffer);
+                inc(next_frame_to_send);
                 break;
             case frame_arrival:
                 dl.from_physical_layer(&r);
@@ -33,14 +38,17 @@ int main()
                     dl.to_network_layer(&r.info);
                     inc(frame_expected);
                 }
-                while()
+                while(Datalink::between(ack_expected, r.ack, next_frame_to_send))
                 {
-
+                    nbuffered = nbuffered -1;
+                    stop_timer(ack_expected);
+                    inc(ack_expected);
                 }
                 break;
             case cksum_err:
                 break;
             case timeout:
+                next_frame_to_send = ack_expected;
                 break;
         }   // end of switch
 

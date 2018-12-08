@@ -67,6 +67,10 @@ void Network::from_datalink_layer(packet *pkt)
     
     sprintf(fileName, "network_datalink.share.%04d", NetworkDatalinkSeq);
     
+    // 文件不存在循环等待
+    while (access(fileName, F_OK) < 0)
+        sleep(1);
+
     int fd;
     do
     {

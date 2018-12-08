@@ -3,6 +3,7 @@
         "cstdio": "cpp",
         "cstdlib": "cpp",
         "string.h": "c",
-        "xiosbase": "cpp"
+        "xiosbase": "cpp",
+        "ostream": "cpp"
     }
 }
