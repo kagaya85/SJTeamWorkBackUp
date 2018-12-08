@@ -72,7 +72,7 @@ void Network::from_datalink_layer(packet *pkt)
     {
         errno = 0;
         fd = open(filename, O_RDONLY);
-    } while (fd < 0 && errno == EINTR)
+    } while (fd < 0 && errno == EINTR);
 
     if (fd < 0)
     {

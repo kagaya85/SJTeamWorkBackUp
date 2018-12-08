@@ -1,10 +1,14 @@
 #ifndef NETWORK
 #define NETWORK
 
+#define PADbyte 0
+
 #include <cstdlib>
 #include "common.h"
 
 using namespace std;
+
+const char EndPacket[MAX_PKT] = {0};
 
 class Network {
 private:
