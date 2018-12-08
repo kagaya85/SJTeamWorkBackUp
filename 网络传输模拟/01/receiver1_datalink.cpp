@@ -19,7 +19,6 @@ int main()
         pid = getPidByName("physical");
     }
 
-
     while(true)
     {
         //cout << "datalink start wait" << endl;
