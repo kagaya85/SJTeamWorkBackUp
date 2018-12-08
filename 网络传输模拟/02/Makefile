@@ -4,7 +4,7 @@ RM = rm -f
 RMRF = rm -rf
 FLAGS = -std=c++11
 
-ROUTE = ../common/
+ROUTE = ../common
 
 DataLinkCacheDir = toDatalinkCache
 NetworkCacheDir = toNetworkCache
