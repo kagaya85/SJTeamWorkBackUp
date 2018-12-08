@@ -15,7 +15,7 @@ enum Link_State
 };
 enum Socket_Exchange_State
 {
-    SOCKET_ERROR, SOCKET_CLOSE, SOCKET_OK
+    SOCKET_ERROR, SOCKET_CLOSE, FROM_DATALINK_ERROR, TO_DATALINK_ERROR, SOCKET_OK
 };
 enum Read_State
 {

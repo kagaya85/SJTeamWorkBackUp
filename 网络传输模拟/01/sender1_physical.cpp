@@ -76,22 +76,37 @@ int main(const int argc, char *argv[])
             continue;
         }
 
-        if(data_exchange(SENDER, DatalinkLayer_pid, DatalinkLayer_msgid, sockfd) == SOCKET_ERROR)
+        int exchgres = (SENDER, DatalinkLayer_pid, DatalinkLayer_msgid, sockfd);
+        if(exchgres == SOCKET_ERROR)
         {
             close(sockfd);
-
-            sockfd = starup_client();
-            FD_ZERO(&sockfds);
-            FD_SET(sockfd, &sockfds);
-
-            continue;
+            cerr << "Physical Layer Sender: Socket Error" << endl;
+            break;
         }
-        else // SOCKET_CLOSE
+		else if(exchgres == FROM_DATALINK_ERROR)
+		{
+			close(sockfd);
+            cerr << "Physical Layer Sender: From Datalink Layer Error" << endl;
+            break;
+		}
+		else if(exchgres == TO_DATALINK_ERROR)
+		{
+			close(sockfd);
+            cerr << "Physical Layer Sender: To Datalink Layer Error" << endl;
+            break;
+		}
+        else if(exchgres == SOCKET_CLOSE) // SOCKET_CLOSE
         {
             cout << "Sender: Physical Connection Disconnected" << endl;
             close(sockfd);
             break;
         }
+		else // SOCKET_OK, this will not be run if works correct
+		{
+			cout << "Sender: Physical Connection Finish" << endl;
+            close(sockfd);
+            break;
+		}
     }
 	
     cout << "Sender Physical Layer Exit" << endl;
