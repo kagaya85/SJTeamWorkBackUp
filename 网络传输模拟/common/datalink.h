@@ -2,9 +2,16 @@
 #define DATALINK
 
 #include <stdio.h>
+#include <iostream>
 #include <time.h>
+#include <cstring>
+#include <netinet/in.h>
 #include <dirent.h>
-
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <sys/time.h>
+#include <sys/file.h>
+#include <errno.h>
 #include "common.h"
 
 #define TIMEOUT_LIMIT 10000 // µ¥Î»ms 10s 
@@ -12,10 +19,10 @@
 using namespace std;
 
 struct TimerNode {
-    clock_t nowTime,
-    frame_type ftype,
-    seq_nr seq,
-    TimerNode *next
+    clock_t nowTime;
+    frame_kind fkind;
+    seq_nr seq;
+    TimerNode *next;
 };
 
 class Datalink {

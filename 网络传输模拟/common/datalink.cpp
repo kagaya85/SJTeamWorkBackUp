@@ -1,5 +1,7 @@
 #include "datalink.h"
 
+using namespace std;
+
 TimerNode *header;
 event_type datalinkEvent;
 unsigned int arrivedPacketNum;    // 来自网络层已经到达的包数量
@@ -20,7 +22,7 @@ Datalink::Datalink()
     // 设置信号处理函数
     signal(SIGALRM, Datalink::sigalarm_handle);    
     signal(SIG_FRAME_ARRIVAL, Datalink::sig_frame_arrival_handle);
-    signal(SIG_NETWORK_LAYER_READY, Datalink::sig_networklayer_ready_handle);
+    signal(SIG_NETWORKLAYER_READY, Datalink::sig_network_layer_ready_handle);
     
     // 设置已毫秒为单位的闹钟
     struct itimerval new_value;    
@@ -64,7 +66,7 @@ void Datalink::start_timer(seq_nr k)
         }
         header->next = NULL;
         header->nowTime = TIMEOUT_LIMIT;
-        header->fkind = dataFrame;
+        header->fkind = DataFrame;
         header->seq = k;
     }
     else
@@ -90,7 +92,7 @@ void Datalink::start_timer(seq_nr k)
         if (t == 0)
             t++;
         p->nowTime = t;
-        p->fkind = dataFrame;
+        p->fkind = DataFrame;
         p->seq = k;
     }
 }
@@ -101,7 +103,7 @@ void Datalink::stop_timer(seq_nr k)
     if (!header)
         return;
 
-    if (header->seq == k && header->ftype == dataFrame)
+    if (header->seq == k && header->fkind == DataFrame)
     {
         p = header;
         header = header->next;
@@ -113,7 +115,7 @@ void Datalink::stop_timer(seq_nr k)
     q = header->next;
     while (q)
     {
-        if(q->seq == k && q->ftype == dataFrame)
+        if(q->seq == k && q->fkind == DataFrame)
         {
             p->next = q->next;
             delete q;
@@ -153,12 +155,12 @@ void Datalink::start_ack_timer()
         }
         header->next = NULL;
         header->nowTime = TIMEOUT_LIMIT;
-        header->ftype = ackFrame;
+        header->fkind = AckFrame;
     }
     else
     {
         p = header;
-        t = TIMEOUT_LIMIT
+        t = TIMEOUT_LIMIT;
 
         while (p->next)
         {
@@ -178,7 +180,7 @@ void Datalink::start_ack_timer()
         if (t == 0)
             t++;
         p->nowTime = t;
-        p->ftype = ackFrame;
+        p->fkind = AckFrame;
         p->seq = k;
     }
 }
@@ -189,7 +191,7 @@ void Datalink::stop_ack_timer()
     if (!header)
         return;
 
-    if (header->seq == k && header->ftype == ackFrame)
+    if (header->seq == k && header->fkind == AckFrame)
     {
         p = header;
         header = header->next;
@@ -201,7 +203,7 @@ void Datalink::stop_ack_timer()
     q = header->next;
     while (q)
     {
-        if(q->seq == k && q->ftype == ackFrame)
+        if(q->seq == k && q->fkind == AckFrame)
         {
             p->next = q->next;
             delete q;
@@ -243,12 +245,12 @@ static void Datalink::sigalarm_handle(int signal)
     header->nowTime -= 1;
     if (header->nowTime <= 0)
     {
-        if (header->ftype == dataFrame)
+        if (header->fkind == DataFrame)
         {
             datalinkEvent = timeout;
             timeoutSeq = header->seq;
         }
-        else if (header->ftype == ackFrame)
+        else if (header->fkind == AckFrame)
         {
             datalinkEvent = ack_timeout;
         }
@@ -317,7 +319,7 @@ void Datalink::from_network_layer(packet *pkt)
     do
     {
         errno = 0;
-        ret = read(fd, pkt.data, MAX_PKT);
+        ret = read(fd, pkt->data, MAX_PKT);
     } while (ret < 0 && errno == EINTR);
 
     if (ret < 0)
@@ -363,7 +365,7 @@ void Datalink::to_network_layer(packet *pkt)
     do
     {
         errno = 0;
-        ret = write(fd, pkt.data, MAX_PKT);
+        ret = write(fd, pkt->data, MAX_PKT);
     } while (ret < 0 && errno == EINTR);
 
     if (ret < 0)
@@ -387,7 +389,7 @@ void Datalink::from_physical_layer(frame *frm)
     do
     {
         errno = 0;
-        msgrcv(msgid, &msg, MSGBUFF_SIZE, FROM_PHYSICAL, 0)
+        msgrcv(msgid, &msg, MSGBUFF_SIZE, FROM_PHYSICAL, 0);
     } while (ret < 0 && errno == EINTR);
 
     if (ret < 0)
@@ -399,7 +401,7 @@ void Datalink::from_physical_layer(frame *frm)
     memcpy(&(frm->kind), msg.data, 4);
     memcpy(&(frm->seq), &msg.data[4], 4);
     memcpy(&(frm->ack), &msg.data[8], 4);
-    memcpy(frm->info, &msg.data[12], MAX_PKT);
+    memcpy(frm->info.data, &msg.data[12], MAX_PKT);
     
     frm->kind = ntohl(frm->kind);
     frm->ack = ntohl(frm->ack);
@@ -418,14 +420,14 @@ void Datalink::to_physical_layer(frame *frm)
     memcpy(msg.data, &(frm->kind), 4);
     memcpy(&msg.data[4], &(frm->seq), 4);
     memcpy(&msg.data[8], &(frm->ack), 4);
-    memcpy(&msg.data[12], frm->info, MAX_PKT);
+    memcpy(&msg.data[12], frm->info.data, MAX_PKT);
     msg.msg_type = FROM_DATALINK;
     // 向队列发送
     int ret;
     do
     {
         errno = 0;
-        msgsnd(msgid, &msg, MSGBUFF_SIZE, 0)
+        msgsnd(msgid, &msg, MSGBUFF_SIZE, 0);
     } while (ret < 0 && errno == EINTR);
 
     if (ret < 0)
@@ -460,7 +462,7 @@ void Datalink::send_data(frame_kind fk, seq_nr frame_nr, seq_nr frame_expected, 
         s.info = buffer[frame_nr % NR_BUFS];
     s.seq = frame_nr;
     s.ack = (frame_expected + MAX_SEQ) % (MAX_SEQ+1);
-    if (fk == nak)
+    if (fk == NakFrame)
         no_nak = false;
     to_physical_layer(&s);
     if (fk == DataFrame)
