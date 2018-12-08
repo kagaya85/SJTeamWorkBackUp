@@ -6,7 +6,7 @@ Datalink::Datalink()
     no_nak = true;
     datalinkEvent = no_event;
     NetworkDatalinkSeq = 0;
-    // DatalinkPhysicalSeq = 0;
+    DatalinkNetworkSeq = 0;
     arrivedPacketNum = 0;
     arrivedFrameNum = 0;
     NetworkStatus = Enable; // 默认网络层初始enable
@@ -322,7 +322,9 @@ void Datalink::to_network_layer(packet *pkt)
 {
     char fileName[50];
     
-    sprintf(fileName, "network_datalink.share.%04d", NetworkDatalinkSeq);
+    sprintf(fileName, "datalink_network.share.%04d", DatalinkNetworkSeq);
+
+    
     int fd;
     do
     {
@@ -353,7 +355,7 @@ void Datalink::to_network_layer(packet *pkt)
     }
     
     close(fd);
-    seq_inc(NetworkDatalinkSeq);
+    seq_inc(DatalinkNetworkSeq);
     return;
 }
 
