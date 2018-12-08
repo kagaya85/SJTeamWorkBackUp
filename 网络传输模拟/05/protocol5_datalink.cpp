@@ -49,6 +49,7 @@ int main()
                 break;
             case timeout:
                 next_frame_to_send = ack_expected;
+                
                 break;
         }   // end of switch
 
