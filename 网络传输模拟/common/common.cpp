@@ -40,7 +40,7 @@ pid_t getPidByName(const char * const task_name)
                 sscanf(buf, "%*s %s", cur_task_name);
 
                 //如果文件内容满足要求则打印路径的名字（即进程的PID）
-                if (!strcmp(task_name, cur_task_name)){
+                if (!strstr(cur_task_name, task_name)){
                     pid = atoi(ptr->d_name);
                     // sscanf(ptr->d_name, "%d", pid);
                     return pid;
