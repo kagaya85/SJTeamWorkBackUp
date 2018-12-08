@@ -44,7 +44,4 @@ int isEndPacket(const packet &Packet);
 void RemovePAD(packet &Packet, int &len);
 void FillPAD(unsigned char * const Packet, const int startPosition);
 
-const char* To_Datalink_Dir = "./toDatalinkCache";
-const char* To_Network_Dir = "./toNetworkCache";
-
 #endif // NETWORK
