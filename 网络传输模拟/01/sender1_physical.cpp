@@ -64,7 +64,7 @@ int main(const int argc, char *argv[])
             continue;
         }
 
-        int exchgres = (SENDER, DatalinkLayer_pid, DatalinkLayer_msgid, sockfd);
+        int exchgres = data_exchange(SENDER, DatalinkLayer_pid, DatalinkLayer_msgid, sockfd);
         if(exchgres == SOCKET_ERROR)
         {
             close(sockfd);

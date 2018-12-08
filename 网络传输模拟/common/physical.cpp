@@ -79,8 +79,6 @@ int data_exchange(const int side, const int pid, const int msgid, const int sock
             return SOCKET_CLOSE;
         }
 
-        cout << "Ready to Read or Write" << endl;
-
         if(FD_ISSET(sockfd, &readfds))
         {
             int read_res;
