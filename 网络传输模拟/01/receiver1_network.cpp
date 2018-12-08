@@ -26,7 +26,7 @@ int main(const int argc, const char* argv[])
 {
     if(argc != 2)
 	{
-		printf("Usage:%s [filename]\n", argv[0]);
+		printf("Usage:%s [reeive-filename]\n", argv[0]);
 		return 1;
 	}
 
@@ -44,7 +44,14 @@ int main(const int argc, const char* argv[])
 
     while(TaihouDaisuki)
     {
-        NetworkLayer.from_datalink_layer(&Curpacket);
+        int res = NetworkLayer.from_datalink_layer(&Curpacket);
+        if(res == -1) // from datalink timeout
+        {
+            unsigned int LastSec = 1000000;
+            while(LastSec)
+                LastSec = usleep(LastSec);
+            continue;
+        }
         if(isEndPacket(Curpacket))
         {
             //write last packet into file
@@ -61,7 +68,7 @@ int main(const int argc, const char* argv[])
         }
     }
 
-    cout << "Receiver: File Exchange Finish." << endl;
+    cout << "NetworkLayer Receiver: File Exchange Finish." << endl;
     fout.close();
     return 0;
 }

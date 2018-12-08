@@ -23,7 +23,7 @@ int main(const int argc, const char* argv[])
 {
     if(argc != 2)
 	{
-		printf("Usage:%s [filename]\n", argv[0]);
+		printf("Usage:%s [send-filename]\n", argv[0]);
 		return 1;
 	}
 
@@ -83,7 +83,7 @@ int main(const int argc, const char* argv[])
         }
     }
 
-    cout << "Sender: File Send Finish." << endl;
+    cout << "NetworkLayer Sender: File Send Finish." << endl;
     fin.close();
     return 0;
 }
