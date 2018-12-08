@@ -22,21 +22,28 @@ int main()
     while(true)
     {
         wait_for_event(&event);
-        if (event == frame_arrival)
+        switch(event)
         {
-            dl.from_physical_layer(&r);
-            if (r.seq == frame_expected)
-            {
-                to_network_layer(&r.info);
-                inc(frame_expected);
-            }
-            if (r.ack == next_frame_to_send)
-            {
-                dl.stop_timer(r.ack);
-                from_network_layer(&buffre);
-                inc(next_frame_to_send);
-            }
-        }
+            case network_layer_ready:
+                break;
+            case frame_arrival:
+                dl.from_physical_layer(&r);
+                if (r.seq == frame_expected)
+                {
+                    dl.to_network_layer(&r.info);
+                    inc(frame_expected);
+                }
+                while()
+                {
+
+                }
+                break;
+            case cksum_err:
+                break;
+            case timeout:
+                break;
+        }   // end of switch
+
         // 发送新包
         s.info = buffer;
         s.seq = next_frame_to_send;
