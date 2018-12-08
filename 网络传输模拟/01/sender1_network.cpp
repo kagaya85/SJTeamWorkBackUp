@@ -19,8 +19,6 @@
 
 using namespace std;
 
-void FillPAD(unsigned char * const Packet, const int startPosition);
-
 int main(const int argc, const char* argv[])
 {
     if(argc != 2)
@@ -88,10 +86,4 @@ int main(const int argc, const char* argv[])
     cout << "Sender: File Send Finish." << endl;
     fin.close();
     return 0;
-}
-
-void FillPAD(unsigned char * const Packet, const int startPosition)
-{
-    for(int i = startPosition; i < MAX_PKT; ++i)
-        Packet[i] = PADbyte;
 }
