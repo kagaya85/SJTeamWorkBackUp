@@ -1,4 +1,4 @@
-#include "Datalink.h"
+#include "datalink.h"
 
 TimerNode *header;
 event_type datalinkEvent;
