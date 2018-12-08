@@ -1,9 +1,13 @@
 CC = g++
 MAKE = make
 RM = rm -f
+RMRF = rm -rf
 FLAGS = -std=c++11
 
 ROUTE = ../common/
+
+DataLinkCacheDir = toDatalinkCache
+NetworkCacheDir = toNetworkCache
 
 NETWORK-NAME = network
 NETWORK-SND-SRC = sender2_$(NETWORK-NAME).cpp
@@ -58,3 +62,4 @@ clean:
 	$(RM) $(NETWORK-SND-TARGET) $(NETWORK-REC-TARGET) \
 	 	  $(DATALINK-SND-TARGET) $(DATALINK-REC-TARGET) \
 	 	  $(PHYSICAL-SND-TARGET) $(NETWORK-PHYSICAL-TARGET)
+	$(RMRF) $(toDatalinkCache) $(toNetworkCache)

@@ -62,7 +62,4 @@ public:
     static void sig_network_layer_ready_handle(int signal);
 };
 
-const char* To_Datalink_Dir = "./toDatalinkCache";
-const char* To_Network_Dir = "./toNetworkCache";
-
 #endif // DATALINK

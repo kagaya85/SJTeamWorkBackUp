@@ -1,9 +1,13 @@
 CC = g++
 MAKE = make
 RM = rm -f
+RMRF = rm -rf
 FLAGS = -std=c++11
 
 ROUTE = ../common/
+
+DataLinkCacheDir = toDatalinkCache
+NetworkCacheDir = toNetworkCache
 
 NETWORK-NAME = network
 NETWORK-SRC = protocol5_$(NETWORK-NAME).cpp
@@ -50,3 +54,4 @@ clean:
 	$(RM) $(NETWORK-TARGET) \
 	 	  $(DATALINK-TARGET) \
 	 	  $(PHYSICAL-SND-TARGET) $(NETWORK-PHYSICAL-TARGET)
+	$(RMRF) $(toDatalinkCache) $(toNetworkCache)
