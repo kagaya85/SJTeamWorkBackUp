@@ -13,9 +13,6 @@ Network::~Network()
     return;
 }
 
-    pid = getPidByName("datalink");
-}
-
 void Network::seq_inc(seq_nr k)
 {
     if(k < MAX_SHARE_SEQ) 
@@ -25,6 +22,12 @@ void Network::seq_inc(seq_nr k)
 }
 
 layer_status Network::status()
+{
+    return NetworkStatus;
+}
+
+void Network::to_datalink_layer(packet *pkt)
+{
     int fd;
     do
     {
