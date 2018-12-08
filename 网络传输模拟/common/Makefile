@@ -47,4 +47,4 @@ $(COMMON-O): $(COMMON-SRC) $(COMMON-H)
 	$(CC) $(FLAGS) -c $< -o $@
 
 clean:
-	$(RM) *.o *.so
+	$(RM) *.o
