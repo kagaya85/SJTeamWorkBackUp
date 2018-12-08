@@ -72,7 +72,7 @@ struct Message {
     unsigned char data[MSGBUFF_SIZE];
 };
 
-const char To_Datalink_Dir = "./toDatalinkCache"
-const char To_Network_Dir = "./toNetworkCache"
+const char* To_Datalink_Dir = "./toDatalinkCache";
+const char* To_Network_Dir = "./toNetworkCache";
 
 #endif // COMMON

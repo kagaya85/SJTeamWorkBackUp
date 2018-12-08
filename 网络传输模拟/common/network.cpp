@@ -1,5 +1,7 @@
 #include "network.h"
 
+using namespace std;
+
 layer_status Network::NetworkStatus;
 
 Network::Network()
@@ -85,7 +87,7 @@ int Network::from_datalink_layer(packet *pkt)
     
     // 文件不存在 返回-1
     while (access(fileName, F_OK) < 0)
-        return -1
+        return -1;
 
     do
     {

@@ -18,8 +18,6 @@
 
 #include "common.h"
 
-using namespace std;
-
 const char EndPacket[MAX_PKT] = {0};
 
 class Network {
@@ -44,7 +42,7 @@ public:
 //----------common function----------
 int isEndPacket(const packet &Packet);
 void RemovePAD(packet &Packet, int &len);
+void FillPAD(unsigned char * const Packet, const int startPosition);
 
-void FillPAD(unsigned char * const Packet, const int startPosition)£»
 
 #endif // NETWORK
