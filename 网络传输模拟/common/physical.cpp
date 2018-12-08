@@ -58,6 +58,7 @@ int data_exchange(const int side, const int pid, const int msgid, const int sock
     char buffer_snd[DatapackLen], buffer_rec[DatapackLen];
     int buffer_snd_len, buffer_rec_len;
     int _rs, _ws, ressel;
+    int _rcvs, _snds;
 
     struct Message msg_data;
 
@@ -67,6 +68,7 @@ int data_exchange(const int side, const int pid, const int msgid, const int sock
         writefds = sockfds;
         do
         {
+            errno = 0;
             ressel = select(FD_SETSIZE, &readfds, &writefds, NULL, NULL);
         }while(ressel < 0 && errno == EINTR);
 
@@ -120,8 +122,13 @@ int data_exchange(const int side, const int pid, const int msgid, const int sock
             msg_data.msg_type = FROM_PHYSICAL;
             //strcpy(msg_data.text, buffer_rec);
             memcpy(msg_data.data, buffer_rec, buffer_rec_len);
-            if (msgsnd(msgid, (void *)&msg_data, MSGBUFF_SIZE, 0) == -1)
-                return SOCKET_ERROR;
+            do
+            {
+                errno = 0;
+                _snds = msgsnd(msgid, (void *)&msg_data, MSGBUFF_SIZE, 0);
+            }while(_snds == -1 && errno == EINTR);
+            if (_snds == -1)
+                return TO_DATALINK_ERROR;
 
             //send sig to DataLink_layer
             int SIG_OK;
@@ -136,13 +143,18 @@ int data_exchange(const int side, const int pid, const int msgid, const int sock
             // loop to send frame that in message queue
             while(TaihouDaisuki)
             {
-                errno = 0;
-                if(msgrcv(msgid, (void *)&msg_data, MSGBUFF_SIZE, FROM_DATALINK, IPC_NOWAIT) == -1)
+                do
+                {
+                    errno = 0;
+                    _rcvs = msgrcv(msgid, (void *)&msg_data, MSGBUFF_SIZE, FROM_DATALINK, IPC_NOWAIT);
+                }while(_rcvs == -1 && errno == EINTR);
+                
+                if(_rcvs == -1)
                 {
                     if(errno == ENOMSG)
                         break;
                     else
-                        return WRITE_ERROR; 
+                        return FROM_DATALINK_ERROR; 
                 }
                 memcpy(buffer_snd, msg_data.data, DatapackLen);
 

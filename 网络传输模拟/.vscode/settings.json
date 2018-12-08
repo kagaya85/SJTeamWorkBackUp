@@ -4,6 +4,9 @@
         "cstdlib": "cpp",
         "string.h": "c",
         "xiosbase": "cpp",
-        "ostream": "cpp"
+        "ostream": "cpp",
+        "fstream": "cpp",
+        "*.tcc": "cpp",
+        "iostream": "cpp"
     }
 }

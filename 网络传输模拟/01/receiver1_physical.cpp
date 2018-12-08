@@ -79,17 +79,37 @@ int main(const int argc, char *argv[])
         int flag = fcntl(sockfd, F_GETFL, 0);
 		fcntl(sockfd, F_SETFL, flag | O_NONBLOCK);
 
-        if(data_exchange(RECEIVER, DatalinkLayer_pid, DatalinkLayer_msgid, sockfd) == SOCKET_ERROR)
+		int exchgres = data_exchange(RECEIVER, DatalinkLayer_pid, DatalinkLayer_msgid, sockfd);
+        if(exchgres == SOCKET_ERROR)
         {
             close(sockfd);
-            continue;
+            cerr << "Physical Layer Receiver: Socket Error" << endl;
+            break;
         }
-        else // SOCKET_CLOSE
+		else if(exchgres == FROM_DATALINK_ERROR)
+		{
+			close(sockfd);
+            cerr << "Physical Layer Receiver: From Datalink Layer Error" << endl;
+            break;
+		}
+		else if(exchgres == TO_DATALINK_ERROR)
+		{
+			close(sockfd);
+            cerr << "Physical Layer Receiver: To Datalink Layer Error" << endl;
+            break;
+		}
+        else if(exchgres == SOCKET_CLOSE) // SOCKET_CLOSE
         {
             cout << "Receiver: Physical Connection Disconnected" << endl;
             close(sockfd);
             break;
         }
+		else // SOCKET_OK, this will not be run if works correct
+		{
+			cout << "Receiver: Physical Connection Finish" << endl;
+            close(sockfd);
+            break;
+		}
     }
 	
 	close(listenfd);
