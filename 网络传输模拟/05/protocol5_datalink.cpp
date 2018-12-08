@@ -27,7 +27,7 @@ int main()
             case network_layer_ready:
                 dl.from_network_layer(&buffer[next_frame_to_send]);
                 nbuffered++;
-                dl.send_data(next_frame_to_send, frame_expected, buffer);
+                dl.send_data(next_frame_to_send, frame_expected, buffer, MAX_SEQ);
                 inc(next_frame_to_send);
                 break;
             case frame_arrival:
@@ -51,7 +51,7 @@ int main()
                 for (seq_nr i = 1; i <= nbuffered; i++)
                 {
                     dl.stop_timer(next_frame_to_send);  // 避免重复计时
-                    dl.send_data(next_frame_to_send, frame_expected, buffer);
+                    dl.send_data(next_frame_to_send, frame_expected, buffer, MAX_SEQ);
                     inc(next_frame_to_send);
                 }
                 break;

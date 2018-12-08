@@ -33,7 +33,7 @@ int main()
             case network_layer_ready:
                 dl.from_network_layer(&buffer[next_frame_to_send]);
                 nbuffered++;
-                dl.send_data(DataFrame, next_frame_to_send, frame_expected, buffer);
+                dl.send_data(DataFrame, next_frame_to_send, frame_expected, buffer, MAX_SEQ, NR_BUFS);
                 inc(next_frame_to_send);
                 break;
             case frame_arrival:
@@ -41,7 +41,7 @@ int main()
                 if (r.kind == DataFrame)
                 {
                     if((r.seq != frame_expected) && dl.no_nak)
-                        dl.send_data(NakFrame, 0, frame_expected, out_buf); // 发送NAK
+                        dl.send_data(NakFrame, 0, frame_expected, out_buf, MAX_SEQ, NR_BUFS); // 发送NAK
                     else
                         start_ack_timer();
                     
@@ -63,7 +63,7 @@ int main()
                 
                 // 如果发送nak，则找出最后一个确认帧序号的下一个
                 if ((r.kind == nak) && dl.between(ack_expected, (r.ack + 1) % (MAX_SEQ + 1), next_frame_to_send))
-                    dl.send_data(DataFrame, (r.ack + 1) % (MAX_SEQ + 1), frame_expected, out_buf);
+                    dl.send_data(DataFrame, (r.ack + 1) % (MAX_SEQ + 1), frame_expected, out_buf, MAX_SEQ, NR_BUFS);
 
                 // 如果收到ack（独立帧或数据帧捎带）
                 while (dl.between(ack_expected, r.ack, next_frame_to_send))
@@ -75,13 +75,13 @@ int main()
                 break;
             case cksum_err:
                 if(dl.no_nak)
-                    dl.send_data(NakFrame, 0, frame_expected, out_buf);
+                    dl.send_data(NakFrame, 0, frame_expected, out_buf, MAX_SEQ, NR_BUFS);
                 break;
             case timeout:  
-                dl.send_data(DataFrame, dl.get_timeout_seq(), frame_expected, out_buf);
+                dl.send_data(DataFrame, dl.get_timeout_seq(), frame_expected, out_buf, MAX_SEQ, NR_BUFS);
                 break;
             case ack_timeout:
-                dl.send_data(AckFrame, 0, frame_expected, out_buf);
+                dl.send_data(AckFrame, 0, frame_expected, out_buf, MAX_SEQ, NR_BUFS);
                 break;
         }   // end of switch
 
