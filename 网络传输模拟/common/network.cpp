@@ -11,12 +11,12 @@
 
 #include "network.h"
 
-seq_nr Network::NetworkDatalinkSeq;
 layer_status Network::NetworkStatus;
 
 Network::Network()
 {
     NetworkDatalinkSeq = 0;
+    DatalinkNetworkSeq = 0;
     NetworkStatus = Enable;
     /* 装载信号 */
     signal(SIG_NETWORKLAYER_ENABLE, Network::sig_enable_handle);
@@ -45,7 +45,6 @@ void Network::to_datalink_layer(packet *pkt)
     char fileName[50];
 
     sprintf(fileName, "network_datalink.share.%04d", NetworkDatalinkSeq);
-    
 
     int fd;
     do
@@ -84,7 +83,7 @@ void Network::from_datalink_layer(packet *pkt)
 {
     char fileName[50];
     
-    sprintf(fileName, "network_datalink.share.%04d", NetworkDatalinkSeq);
+    sprintf(fileName, "datalink_network.share.%04d", DatalinkNetworkSeq);
     
     int fd;
     do
@@ -116,7 +115,7 @@ void Network::from_datalink_layer(packet *pkt)
     }
     
     close(fd);
-    seq_inc(NetworkDatalinkSeq);
+    seq_inc(DatalinkNetworkSeq);
     return;
 }
 

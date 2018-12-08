@@ -2,8 +2,6 @@
 
 TimerNode *header;
 event_type datalinkEvent;
-seq_nr NetworkDatalinkSeq;
-seq_nr DatalinkNetworkSeq; // 链路层发向网络层的发送序号
 unsigned int arrivedPacketNum;    // 来自网络层已经到达的包数量
 unsigned int arrivedFrameNum;    // 来自物理层已经到达的帧数量
 seq_nr timeoutSeq;

@@ -14,7 +14,8 @@ const char EndPacket[MAX_PKT] = {0};
 
 class Network {
 private:
-    static seq_nr NetworkDatalinkSeq;
+    seq_nr NetworkDatalinkSeq;
+    seq_nr DatalinkNetworkSeq;
     static layer_status NetworkStatus;
 public:
     Network();

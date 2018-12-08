@@ -20,8 +20,8 @@ class Datalink {
 private:
     static TimerNode *header;
     static event_type datalinkEvent;
-    static seq_nr NetworkDatalinkSeq;
-    static seq_nr DatalinkNetworkSeq; // 链路层发向网络层的发送序号
+    seq_nr NetworkDatalinkSeq;
+    seq_nr DatalinkNetworkSeq; // 链路层发向网络层的发送序号
     static unsigned int arrivedPacketNum;    // 来自网络层已经到达的包数量
     static unsigned int arrivedFrameNum;    // 来自物理层已经到达的帧数量
     static seq_nr timeoutSeq;
