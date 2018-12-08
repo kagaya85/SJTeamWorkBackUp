@@ -43,10 +43,6 @@ PHYSICAL-REC-SRC = receiver1_$(PHYSICAL-NAME).cpp
 PHYSICAL-SND-TARGET = sender1_$(PHYSICAL-NAME)
 PHYSICAL-REC-TARGET = receiver1_$(PHYSICAL-NAME)
 
-.PHONY: clean receiverrun senderrun
-	#avoid to make clean.*
-
-
 all: $(NETWORK-SND-TARGET) $(NETWORK-REC-TARGET) \
 	 $(DATALINK-SND-TARGET) $(DATALINK-REC-TARGET) \
 	 $(PHYSICAL-SND-TARGET) $(PHYSICAL-REC-TARGET)
@@ -54,7 +50,6 @@ all: $(NETWORK-SND-TARGET) $(NETWORK-REC-TARGET) \
 # $@-target
 # $^-all prerequisites
 # $<-first prerequisite
-
 
 $(NETWORK-SND-TARGET): $(NETWORK-SND-SRC)
 	$(CC) $(FLAGS) -o $@ $(NETWORK-SND-SRC) $(NETWORK-SRC) $(NETWORK-H) $(COMMON-SRC) $(COMMON-H)
@@ -71,6 +66,9 @@ $(PHYSICAL-SND-TARGET): $(PHYSICAL-SND-SRC)
 $(PHYSICAL-REC-TARGET): $(PHYSICAL-REC-SRC)
 	$(CC) $(FLAGS) -o $@ $(PHYSICAL-REC-SRC) $(PHYSICAL-SRC) $(PHYSICAL-H) $(COMMON-SRC) $(COMMON-H)
 
+.PHONY: clean receiver sender
+	#avoid to make clean.*
+
 clean:
 	$(RM) $(NETWORK-SND-TARGET) $(NETWORK-REC-TARGET) \
 	 	  $(DATALINK-SND-TARGET) $(DATALINK-REC-TARGET) \
@@ -78,7 +76,12 @@ clean:
 		  *.o
 	$(RMRF) $(toDatalinkCache) $(toNetworkCache)
 
-receiverrun:
-    
+receiver:
+	./receiver1_datalink &
+	./receiver1_network receiver1.cpp &
+	./receiver1_physical 4000 &
 
-senderrun:
+sender:
+	./sender1_datalink &
+	./sender1_network receiver1_datalink.cpp &
+	./sender1_physical 115.159.56.102 4000 &
