@@ -1,5 +1,13 @@
 #include "Datalink.h"
 
+TimerNode *header;
+event_type datalinkEvent;
+seq_nr NetworkDatalinkSeq;
+seq_nr DatalinkNetworkSeq; // 链路层发向网络层的发送序号
+unsigned int arrivedPacketNum;    // 来自网络层已经到达的包数量
+unsigned int arrivedFrameNum;    // 来自物理层已经到达的帧数量
+seq_nr timeoutSeq;
+
 Datalink::Datalink()
 {
     header = NULL;
@@ -324,7 +332,7 @@ void Datalink::to_network_layer(packet *pkt)
     
     sprintf(fileName, "datalink_network.share.%04d", DatalinkNetworkSeq);
 
-    
+
     int fd;
     do
     {
@@ -388,6 +396,10 @@ void Datalink::from_physical_layer(frame *frm)
     memcpy(&(frm->seq), &msg.data[4], 4);
     memcpy(&(frm->ack), &msg.data[8], 4);
     memcpy(frm->info, &msg.data[12], MAX_PKT);
+    
+    frm->kind = ntohl(frm->kind);
+    frm->ack = ntohl(frm->ack);
+    frm->seq = ntohl(frm->seq);
     return;
 }
 
@@ -402,6 +414,10 @@ void Datalink::to_physical_layer(frame *frm)
         exit(EXIT_FAILURE);
     }
 
+    frm->kind = htonl(frm->kind);
+    frm->ack = htonl(frm->ack);
+    frm->seq = htonl(frm->seq);
+    
     memcpy(msg.data, &(frm->kind), 4);
     memcpy(&msg.data[4], &(frm->seq), 4);
     memcpy(&msg.data[8], &(frm->ack), 4);
