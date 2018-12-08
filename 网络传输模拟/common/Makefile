@@ -1,6 +1,7 @@
 CC = g++
 MAKE = make
 RM = rm -f
+
 FLAGS = -std=c++11
 
 COMMON-NAME = common
@@ -23,7 +24,7 @@ PHYSICAL-SRC = $(PHYSICAL-NAME).cpp
 PHYSICAL-H = $(PHYSICAL-NAME).h
 PHYSICAL-O = $(PHYSICAL-NAME).o
 
-.PHONY: clean
+.PHONY: all clean
 	#avoid to make clean.*
 
 
@@ -33,14 +34,17 @@ all: $(NETWORK-O) $(DATALINK-O) $(PHYSICAL-O)
 # $^-all prerequisites
 # $<-first prerequisite
 
-$(NETWORK-O): $(NETWORK-SRC) $(NETWORK-H) $(COMMON-SRC) $(COMMON-H)
-	$(CC) $(FLAGS) -c $^ -o $@
+$(NETWORK-O): $(NETWORK-SRC)
+	$(CC) $(FLAGS) -c $< -o $@
 
-$(DATALINK-O): $(DATALINK-SRC) $(DATALINK-H) $(COMMON-SRC) $(COMMON-H)
-	$(CC) $(FLAGS) -c $^ -o $@
+$(DATALINK-O): $(DATALINK-SRC)
+	$(CC) $(FLAGS) -c $< -o $@
 
-$(PHYSICAL-O): $(PHYSICAL-SRC) $(PHYSICAL-H) $(COMMON-SRC) $(COMMON-H)
-	$(CC) $(FLAGS) -c $^ -o $@
+$(PHYSICAL-O): $(PHYSICAL-SRC)
+	$(CC) $(FLAGS) -c $< -o $@
+
+$(COMMON-O): $(COMMON-SRC) $(COMMON-H)
+	$(CC) $(FLAGS) -c $< -o $@
 
 clean:
 	$(RM) *.o
