@@ -6,7 +6,6 @@
 #include "common.h"
 
 #define TIMEOUT_LIMIT 10000 // 单位ms 10s 
-#define MAX_SHARE_SEQ 999   // 共享文件最大序号
 
 using namespace std;
 
@@ -26,7 +25,9 @@ private:
     static unsigned int arrivedPacketNum;    // 来自网络层已经到达的包数量
     static unsigned int arrivedFrameNum;    // 来自物理层已经到达的帧数量
     layer_status NetworkStatus;   // 网络层状态
+    static seq_nr timeoutSeq;
 public:
+    bool no_nak;
     Datalink();
     ~Datalink();
     void start_timer(seq_nr k);
@@ -42,6 +43,8 @@ public:
     void from_physical_layer(frame *frm);
     void to_physical_layer(frame *frm);
     void send_data(seq_nr frame_nr, seq_nr frame_expected, packet bufferp[]);
+    void send_data(frame_kind fk, seq_nr frame_nr, seq_nr frame_expected, packet buffer[]);
+    seq_nr get_timeout_seq();
     static bool between(seq_nr a, seq_nr b, seq_nr c);
     /* 信号处理函数 */
     static void sigalarm_handle(int signal);
