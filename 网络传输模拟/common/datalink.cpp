@@ -394,14 +394,14 @@ void Datalink::from_physical_layer(frame *frm)
         perror("msgrcv failed");
         exit(EXIT_FAILURE);
     }
-    
+
     int tmpkind;
     memcpy(&tmpkind, msg.data, 4);
     memcpy(&(frm->seq), &msg.data[4], 4);
     memcpy(&(frm->ack), &msg.data[8], 4);
     memcpy(frm->info.data, &msg.data[12], MAX_PKT);
     
-    frm->kind = frame_type(ntohl(tmpkind));
+    frm->kind = frame_kind(ntohl(tmpkind));
     frm->ack = ntohl(frm->ack);
     frm->seq = ntohl(frm->seq);
     return;
@@ -412,11 +412,11 @@ void Datalink::to_physical_layer(frame *frm)
     Message msg;
     int tmpkind = frm->kind;
 
-    frm->kind = htonl(tmpkind);
+    tmpkind = htonl(tmpkind);
     frm->ack = htonl(frm->ack);
     frm->seq = htonl(frm->seq);
 
-    memcpy(msg.data, &(tmpkind), 4);
+    memcpy(msg.data, &tmpkind, 4);
     memcpy(&msg.data[4], &(frm->seq), 4);
     memcpy(&msg.data[8], &(frm->ack), 4);
     memcpy(&msg.data[12], frm->info.data, MAX_PKT);
