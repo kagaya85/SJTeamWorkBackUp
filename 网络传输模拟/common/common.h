@@ -30,7 +30,7 @@
 
 pid_t getPidByName(const char * const task_name);
 
-typedef unsigned int seq_nr;    // å‘é€åºå·
+typedef unsigned int seq_nr;    // ·¢ËÍĞòºÅ
 
 class packet {
 public:
@@ -61,10 +61,10 @@ typedef enum {
 } layer_status;
 
 typedef struct {
-    frame_kind kind;// å¸§ç±»å‹
-    seq_nr  seq;    // å‘é€åºå·
-    seq_nr  ack;    // æ¥å—åºå·
-    packet  info;   // æ•°æ®
+    frame_kind kind;// Ö¡ÀàĞÍ
+    seq_nr  seq;    // ·¢ËÍĞòºÅ
+    seq_nr  ack;    // ½ÓÊÜĞòºÅ
+    packet  info;   // Êı¾İ
 } frame;
 
 struct Message {

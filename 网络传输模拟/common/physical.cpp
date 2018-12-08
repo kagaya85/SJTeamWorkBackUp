@@ -84,7 +84,7 @@ int data_exchange(const int side, const int pid, const int msgid, const int sock
 			{
 				errno = 0;
 				_rs = read(sockfd, buffer_rec, DatapackLen);
-			}while(_rs < 0 && errno == EINTR); //琚俊鍙锋墦鏂紝 鍒欓噸鏂皉ead
+			}while(_rs < 0 && errno == EINTR); //被信号打断， 则重新read
             if(_rs > 0)
 			{
                 cerr << (side == SENDER ? "SENDER " : "RECEIVER ");

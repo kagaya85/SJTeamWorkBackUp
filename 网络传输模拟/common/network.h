@@ -35,7 +35,7 @@ public:
     void to_datalink_layer(packet *pkt);
     int from_datalink_layer(packet *pkt);
     void network_layer_ready();
-    /* ä¿¡å·å¤„ç†å‡½æ•° */
+    /* ĞÅºÅ´¦Àíº¯Êı */
     static void sig_enable_handle(int signal);
     static void sig_disable_handle(int signal);
 };
@@ -45,6 +45,6 @@ public:
 int isEndPacket(const packet &Packet);
 void RemovePAD(packet &Packet, int &len);
 
-void FillPAD(unsigned char * const Packet, const int startPosition)ï¼›
+void FillPAD(unsigned char * const Packet, const int startPosition)£»
 
 #endif // NETWORK

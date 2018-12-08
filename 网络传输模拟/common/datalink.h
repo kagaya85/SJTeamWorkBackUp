@@ -7,7 +7,7 @@
 
 #include "common.h"
 
-#define TIMEOUT_LIMIT 10000 // å•ä½ms 10s 
+#define TIMEOUT_LIMIT 10000 // µ¥Î»ms 10s 
 
 using namespace std;
 
@@ -23,11 +23,11 @@ private:
     static TimerNode *header;
     static event_type datalinkEvent;
     seq_nr NetworkDatalinkSeq;
-    seq_nr DatalinkNetworkSeq; // é“¾è·¯å±‚å‘å‘ç½‘ç»œå±‚çš„å‘é€åºå·
-    static unsigned int arrivedPacketNum;    // æ¥è‡ªç½‘ç»œå±‚å·²ç»åˆ°è¾¾çš„åŒ…æ•°é‡
-    static unsigned int arrivedFrameNum;    // æ¥è‡ªç‰©ç†å±‚å·²ç»åˆ°è¾¾çš„å¸§æ•°é‡
+    seq_nr DatalinkNetworkSeq; // Á´Â·²ã·¢ÏòÍøÂç²ãµÄ·¢ËÍĞòºÅ
+    static unsigned int arrivedPacketNum;    // À´×ÔÍøÂç²ãÒÑ¾­µ½´ïµÄ°üÊıÁ¿
+    static unsigned int arrivedFrameNum;    // À´×ÔÎïÀí²ãÒÑ¾­µ½´ïµÄÖ¡ÊıÁ¿
     static seq_nr timeoutSeq;
-    layer_status NetworkStatus;   // ç½‘ç»œå±‚çŠ¶æ€
+    layer_status NetworkStatus;   // ÍøÂç²ã×´Ì¬
     int msgid;
 public:
     bool no_nak;
@@ -41,7 +41,7 @@ public:
     void stop_ack_timer();
     void wait_for_event(event_type *event);
     void seq_inc(seq_nr k);
-    void from_network_layer(packet *pkt);    // -1å¼‚å¸¸ 0æ­£å¸¸
+    void from_network_layer(packet *pkt);    // -1Òì³£ 0Õı³£
     void to_network_layer(packet *pkt);
     void from_physical_layer(frame *frm);
     void to_physical_layer(frame *frm);
@@ -49,7 +49,7 @@ public:
     void send_data(frame_kind fk, seq_nr frame_nr, seq_nr frame_expected, packet buffer[]);
     seq_nr get_timeout_seq();
     static bool between(seq_nr a, seq_nr b, seq_nr c);
-    /* ä¿¡å·å¤„ç†å‡½æ•° */
+    /* ĞÅºÅ´¦Àíº¯Êı */
     static void sigalarm_handle(int signal);
     static void sig_frame_arrival_handle(int signal);
     static void sig_network_layer_ready_handle(int signal);

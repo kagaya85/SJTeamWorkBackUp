@@ -7,7 +7,7 @@ Network::Network()
     NetworkDatalinkSeq = 0;
     DatalinkNetworkSeq = 0;
     NetworkStatus = Enable;
-    /* è£…è½½ä¿¡å· */
+    /* ×°ÔØĞÅºÅ */
     signal(SIG_NETWORKLAYER_ENABLE, Network::sig_enable_handle);
 }
 
@@ -83,7 +83,7 @@ int Network::from_datalink_layer(packet *pkt)
     
     int fd;
     
-    // æ–‡ä»¶ä¸å­˜åœ¨ è¿”å›-1
+    // ÎÄ¼ş²»´æÔÚ ·µ»Ø-1
     while (access(fileName, F_OK) < 0)
         return -1
 
