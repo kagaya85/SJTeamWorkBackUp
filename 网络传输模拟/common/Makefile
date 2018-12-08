@@ -44,7 +44,7 @@ $(PHYSICAL-O): $(PHYSICAL-SRC) $(PHYSICAL-H) $(COMMON-O)
 
 
 $(COMMON-O): $(COMMON-SRC) $(COMMON-H)
-	$(CC) $(FLAGS) -c -fPIC $< -o $@
+	$(CC) $(FLAGS) -c $< -o $@
 
 clean:
-	$(RM) *.o *.so
+	$(RM) *.o

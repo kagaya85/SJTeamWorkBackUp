@@ -4,7 +4,7 @@ RM = rm -f
 RMRF = rm -rf
 FLAGS = -std=c++11
 
-ROUTE = ../common
+ROUTE = ../common/
 
 DataLinkCacheDir = toDatalinkCache
 NetworkCacheDir = toNetworkCache
@@ -14,18 +14,21 @@ NETWORK-SND-SRC = sender3_$(NETWORK-NAME).cpp
 NETWORK-REC-SRC = receiver3_$(NETWORK-NAME).cpp
 NETWORK-SND-TARGET = sender3_$(NETWORK-NAME)
 NETWORK-REC-TARGET = receiver3_$(NETWORK-NAME)
+NETWORK-O = $(ROUTE)$(NETWORK-NAME).o
 
 DATALINK-NAME = datalink
 DATALINK-SND-SRC = sender3_$(DATALINK-NAME).cpp
 DATALINK-REC-SRC = receiver3_$(DATALINK-NAME).cpp
 DATALINK-SND-TARGET = sender3_$(DATALINK-NAME)
 DATALINK-REC-TARGET = receiver3_$(DATALINK-NAME)
+DATALINK-O = $(ROUTE)$(DATALINK-NAME).o
 
 PHYSICAL-NAME = physical
 PHYSICAL-SND-SRC = sender3_$(PHYSICAL-NAME).cpp
 PHYSICAL-REC-SRC = receiver3_$(PHYSICAL-NAME).cpp
 PHYSICAL-SND-TARGET = sender3_$(PHYSICAL-NAME)
 PHYSICAL-REC-TARGET = receiver3_$(PHYSICAL-NAME)
+PHYSICAL-O = $(ROUTE)$(PHYSICAL-NAME).o
 
 .PHONY: clean
 	#avoid to make clean.*
@@ -41,19 +44,19 @@ all: $(NETWORK-SND-TARGET) $(NETWORK-REC-TARGET) \
 
 
 $(NETWORK-SND-TARGET): $(NETWORK-SND-SRC)
-	$(CC) $(FLAGS) -o $@ $< -L $(ROUTE) -l $(NETWORK-NAME)
+	$(CC) $(FLAGS) -o $@ $< $(NETWORK-O)
 $(NETWORK-REC-TARGET): $(NETWORK-REC-SRC)
-	$(CC) $(FLAGS) -o $@ $< -L $(ROUTE) -l $(NETWORK-NAME)
+	$(CC) $(FLAGS) -o $@ $< $(NETWORK-O)
 
 $(DATALINK-SND-TARGET): $(DATALINK-SND-SRC)
-	$(CC) $(FLAGS) -o $@ $< -L $(ROUTE) -l $(DATALINK-NAME)
+	$(CC) $(FLAGS) -o $@ $< $(DATALINK-O)
 $(DATALINK-REC-TARGET): $(DATALINK-REC-SRC)
-	$(CC) $(FLAGS) -o $@ $< -L $(ROUTE) -l $(DATALINK-NAME)
+	$(CC) $(FLAGS) -o $@ $< $(DATALINK-O)
 
 $(PHYSICAL-SND-TARGET): $(PHYSICAL-SND-SRC)
-	$(CC) $(FLAGS) -o $@ $< -L $(ROUTE) -l $(PHYSICAL-NAME)
+	$(CC) $(FLAGS) -o $@ $< $(PHYSICAL-O)
 $(PHYSICAL-REC-TARGET): $(PHYSICAL-REC-SRC)
-	$(CC) $(FLAGS) -o $@ $< -L $(ROUTE) -l $(PHYSICAL-NAME)
+	$(CC) $(FLAGS) -o $@ $< $(PHYSICAL-O)
 
 clean:
 	$(RM) $(NETWORK-SND-TARGET) $(NETWORK-REC-TARGET) \
