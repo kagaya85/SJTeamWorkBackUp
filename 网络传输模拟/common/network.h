@@ -13,7 +13,6 @@ private:
 public:
     Network();
     ~Network();
-    void network_layer_ready();
     void seq_inc(seq_nr k);
     layer_status status();
     void to_datalink_layer(packet *pkt);
