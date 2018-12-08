@@ -43,6 +43,9 @@ int main(const int argc, const char* argv[])
                 LastSec = usleep(LastSec);
             continue;
         }
+
+        cout << "Receiver Network: Receive packet from datalink" << endl;
+
         if(isEndPacket(Curpacket))
         {
             //write last packet into file

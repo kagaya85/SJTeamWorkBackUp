@@ -41,6 +41,8 @@ int main(const int argc, const char* argv[])
             continue;
         }
 
+        cout << "Sender Network: ready to pick packet" << endl;
+
         if(EndPackFlag) // send EndPacket
         {
             memcpy(Packet.data, EndPacket, MAX_PKT);
@@ -50,6 +52,9 @@ int main(const int argc, const char* argv[])
 
         fin.read((char *)FileBuffer, MAX_PKT);
         bufferLen = fin.gcount();
+
+        cout << "Sender Network: pick packet from file " << bufferLen << " byte(s)" << endl;
+
         if(bufferLen < MAX_PKT) //file read finish
         {
             if(bufferLen) // not single EOF
