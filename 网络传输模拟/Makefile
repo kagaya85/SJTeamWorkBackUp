@@ -1,8 +1,9 @@
 MAKE = make
 
+COMMON_MAKE = COMMON
 COMMON_DIR = common
 
-DFS_DIR = DFS
+DFS_MAKE = DFS
 
 exclude_dirs := include bin
 
@@ -17,12 +18,12 @@ dirs := $(filter-out $(exclude_dirs),$(dirs))
 .PHONY: clean 
 	#avoid to make clean.*
 
-all: $(COMMON_DIR) $(DFS_DIR)
+all: $(COMMON_MAKE) $(DFS_MAKE)
 
-$(COMMON_DIR):
-	$(MAKE) -C $$COMMON_DIR all || exit 1; 
+$(COMMON_MAKE):
+	$(MAKE) -C $(COMMON_DIR) all || exit 1;
 
-$(DFS_DIR):
+$(DFS_MAKE):
 	@for dir in $(dirs); \
 	do \
 		if [ "$$dir"x = "$(COMMON_DIR)"x ]; \
