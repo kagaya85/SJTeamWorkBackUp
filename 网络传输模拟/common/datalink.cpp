@@ -7,6 +7,7 @@ event_type datalinkEvent;
 unsigned int arrivedPacketNum;    // 来自网络层已经到达的包数量
 unsigned int arrivedFrameNum;    // 来自物理层已经到达的帧数量
 seq_nr timeoutSeq;
+layer_status NetworkStatus;
 
 Datalink::Datalink()
 {
@@ -72,7 +73,7 @@ void Datalink::start_timer(seq_nr k)
     else
     {
         p = header;
-        t = TIMEOUT_LIMIT
+        t = TIMEOUT_LIMIT;
 
         while (p->next)
         {
@@ -181,7 +182,6 @@ void Datalink::start_ack_timer()
             t++;
         p->nowTime = t;
         p->fkind = AckFrame;
-        p->seq = k;
     }
 }
 
@@ -191,7 +191,7 @@ void Datalink::stop_ack_timer()
     if (!header)
         return;
 
-    if (header->seq == k && header->fkind == AckFrame)
+    if (header->fkind == AckFrame)
     {
         p = header;
         header = header->next;
@@ -203,7 +203,7 @@ void Datalink::stop_ack_timer()
     q = header->next;
     while (q)
     {
-        if(q->seq == k && q->fkind == AckFrame)
+        if(q->fkind == AckFrame)
         {
             p->next = q->next;
             delete q;
@@ -237,7 +237,7 @@ void Datalink::seq_inc(seq_nr k)
 }
 
 /* 信号处理函数 */
-static void Datalink::sigalarm_handle(int signal)
+void Datalink::sigalarm_handle(int signal)
 {
     if (!header)
         return;
@@ -261,22 +261,19 @@ static void Datalink::sigalarm_handle(int signal)
     }
     else    // 未超时
         datalinkEvent = no_event;
-    signal(SIGALRM, Datalink::sigalarm_handle);    
 }
 
-static void Datalink::sig_frame_arrival_handle(int signal)
+void Datalink::sig_frame_arrival_handle(int signal)
 {
     arrivedFrameNum++;
     datalinkEvent = frame_arrival;
-    signal(SIG_FRAME_ARRIVAL, Datalink::sig_frame_arrival_handle);
 }
 
-static void Datalink::sig_network_layer_ready_handle(int signal)
+void Datalink::sig_network_layer_ready_handle(int signal)
 {
     arrivedPacketNum++;
     datalinkEvent = network_layer_ready;
     NetworkStatus = Enable;
-    signal(SIG_NETWORKLAYER_READY, Datalink::sig_networklayer_ready_handle);    
 }
 
 seq_nr Datalink::get_timeout_seq()
@@ -305,7 +302,7 @@ void Datalink::from_network_layer(packet *pkt)
     {
         errno = 0;
         fd = open(fileName, O_RDONLY);
-    } while (fd < 0 && errno = EINTR);
+    } while (fd < 0 && errno == EINTR);
     
     if (fd < 0)
     {
@@ -351,7 +348,7 @@ void Datalink::to_network_layer(packet *pkt)
     {
         errno = 0;
         fd = open(fileName, O_WRONLY | O_CREAT);
-    } while (fd < 0 && errno = EINTR);
+    } while (fd < 0 && errno == EINTR);
 
     if (fd < 0)
     {
@@ -439,34 +436,34 @@ void Datalink::to_physical_layer(frame *frm)
     return;
 }
 
-static bool Datalink::between(seq_nr a, seq_nr b, seq_nr c)
+bool Datalink::between(seq_nr a, seq_nr b, seq_nr c)
 {
-    retutn (((a <= b) && (b < c)) || ((c < a) && (a <= b)) || ((b < c) && (c < a)));
+    return (((a <= b) && (b < c)) || ((c < a) && (a <= b)) || ((b < c) && (c < a)));
 }
 
-void Datalink::send_data(seq_nr frame_nr, seq_nr frame_expected, packet buffer[])
+void Datalink::send_data(seq_nr frame_nr, seq_nr frame_expected, packet buffer[], int max_seq)
 {
     frame s;
     s.info = buffer[frame_nr];
     s.seq = frame_nr;
-    s.ack = (frame_expected + MAX_SEQ) % (MAX_SEQ + 1);
+    s.ack = (frame_expected + max_seq) % (max_seq + 1);
     to_physical_layer(&s);
     start_timer(frame_nr);
 }
 
-void Datalink::send_data(frame_kind fk, seq_nr frame_nr, seq_nr frame_expected, packet buffer[])
+void Datalink::send_data(frame_kind fk, seq_nr frame_nr, seq_nr frame_expected, packet buffer[], int max_seq, int nr_bufs)
 {
     frame s;
     s.kind = fk;
     if (fk == DataFrame)
-        s.info = buffer[frame_nr % NR_BUFS];
+        s.info = buffer[frame_nr % nr_bufs];
     s.seq = frame_nr;
-    s.ack = (frame_expected + MAX_SEQ) % (MAX_SEQ+1);
+    s.ack = (frame_expected + max_seq) % (max_seq+1);
     if (fk == NakFrame)
         no_nak = false;
     to_physical_layer(&s);
     if (fk == DataFrame)
-        start_timer(frame_nr % NR_BUFS);
+        start_timer(frame_nr % nr_bufs);
     stop_ack_timer();
 }
 

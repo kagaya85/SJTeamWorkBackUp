@@ -34,7 +34,7 @@ private:
     static unsigned int arrivedPacketNum;    // 来自网络层已经到达的包数量
     static unsigned int arrivedFrameNum;    // 来自物理层已经到达的帧数量
     static seq_nr timeoutSeq;
-    layer_status NetworkStatus;   // 网络层状态
+    static layer_status NetworkStatus;   // 网络层状态
     int msgid;
 public:
     bool no_nak;
@@ -52,8 +52,8 @@ public:
     void to_network_layer(packet *pkt);
     void from_physical_layer(frame *frm);
     void to_physical_layer(frame *frm);
-    void send_data(seq_nr frame_nr, seq_nr frame_expected, packet bufferp[]);
-    void send_data(frame_kind fk, seq_nr frame_nr, seq_nr frame_expected, packet buffer[]);
+    void send_data(seq_nr frame_nr, seq_nr frame_expected, packet bufferp[], int max_seq);
+    void send_data(frame_kind fk, seq_nr frame_nr, seq_nr frame_expected, packet buffer[], int max_seq, int nr_bufs;
     seq_nr get_timeout_seq();
     static bool between(seq_nr a, seq_nr b, seq_nr c);
     /* 信号处理函数 */
