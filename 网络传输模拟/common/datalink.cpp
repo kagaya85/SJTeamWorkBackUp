@@ -26,9 +26,17 @@ Datalink::Datalink()
     struct itimerval new_value;    
     new_value.it_value.tv_sec = 0;    
     new_value.it_value.tv_usec = 1000;    
-    new_value.it_interval.tv_sec = 0;    
-    new_value.it_interval.tv_usec = 1000;    
+    new_value.it_interval.tv_sec = 0;
+    new_value.it_interval.tv_usec = 1000;
     setitimer(ITIMER_REAL, &new_value, NULL);
+
+    // 建立消息队列
+    msgid = msgget(IPC_KEY, 0666 | IPC_CREAT);
+    if (msgid < 0)
+    {
+        perror("Message get error");
+        exit(EXIT_FAILURE);
+    }
 }
 
 Datalink::~Datalink()
@@ -285,7 +293,7 @@ void Datalink::from_network_layer(packet *pkt)
         exit(EXIT_FAILURE);
     }
     
-    sprintf(fileName, "network_datalink.share.%04d", NetworkDatalinkSeq);
+    sprintf(fileName, "%s/network_datalink.share.%04d", To_Datalink_Dir, NetworkDatalinkSeq);
     int fd;
         // 文件不存在循环等待
     while (access(fileName, F_OK) < 0)
@@ -328,7 +336,13 @@ void Datalink::to_network_layer(packet *pkt)
 {
     char fileName[50];
     
-    sprintf(fileName, "datalink_network.share.%04d", DatalinkNetworkSeq);
+    if (access(To_Network_Dir, F_OK) < 0)
+    {
+        mode_t mode = umask(0);
+        mkdir(To_Network_Dir, 0777);
+    }
+    
+    sprintf(fileName, "%s/datalink_network.share.%04d", To_Network_Dir, DatalinkNetworkSeq);
 
     int fd;
     do
@@ -366,14 +380,7 @@ void Datalink::to_network_layer(packet *pkt)
 
 void Datalink::from_physical_layer(frame *frm)
 {
-    int msgid = -1;
     Message msg;
-
-    msgid = msgget(IPC_KEY, 0666 | IPC_CREAT);
-    if(msgid < 0) {
-        perror("Message get error");
-        exit(EXIT_FAILURE);
-    }
 
     // 从队列读取
     int ret;
@@ -402,14 +409,7 @@ void Datalink::from_physical_layer(frame *frm)
 
 void Datalink::to_physical_layer(frame *frm)
 {
-    int msgid = -1;
     Message msg;
-
-    msgid = msgget(IPC_KEY, 0666 | IPC_CREAT);
-    if(msgid < 0) {
-        perror("Message get error");
-        exit(EXIT_FAILURE);
-    }
 
     frm->kind = htonl(frm->kind);
     frm->ack = htonl(frm->ack);

@@ -1,14 +1,3 @@
-#include <iostream>
-#include <cstdio>
-
-#include <string.h>
-#include <errno.h>
-#include <fcntl.h>
-
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <sys/file.h>
-
 #include "network.h"
 
 layer_status Network::NetworkStatus;
@@ -43,8 +32,14 @@ layer_status Network::status()
 void Network::to_datalink_layer(packet *pkt)
 {
     char fileName[50];
-
-    sprintf(fileName, "network_datalink.share.%04d", NetworkDatalinkSeq);
+    
+    if (access(To_Datalink_Dir, F_OK) < 0)
+    {
+        mode_t mode = umask(0);
+        mkdir(To_Datalink_Dir, 0777);
+    }
+    
+    sprintf(fileName, "%s/network_datalink.share.%04d", To_Datalink_Dir, NetworkDatalinkSeq);
 
     int fd;
     do
@@ -58,6 +53,7 @@ void Network::to_datalink_layer(packet *pkt)
         cerr << "write file error: " << strerror(errno) << endl;
         exit(EXIT_FAILURE);
     }
+
     flock(fd, LOCK_EX);
 
     int ret;
@@ -83,7 +79,7 @@ int Network::from_datalink_layer(packet *pkt)
 {
     char fileName[50];
     
-    sprintf(fileName, "datalink_network.share.%04d", DatalinkNetworkSeq);
+    sprintf(fileName, "%s/datalink_network.share.%04d", To_Network_Dir, DatalinkNetworkSeq);
     
     int fd;
     

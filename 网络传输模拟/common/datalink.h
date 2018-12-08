@@ -3,6 +3,8 @@
 
 #include <stdio.h>
 #include <time.h>
+#include <dirent.h>
+
 #include "common.h"
 
 #define TIMEOUT_LIMIT 10000 // 单位ms 10s 
@@ -26,6 +28,7 @@ private:
     static unsigned int arrivedFrameNum;    // 来自物理层已经到达的帧数量
     static seq_nr timeoutSeq;
     layer_status NetworkStatus;   // 网络层状态
+    int msgid;
 public:
     bool no_nak;
     Datalink();
