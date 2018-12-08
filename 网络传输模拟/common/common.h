@@ -22,11 +22,13 @@
 #define FROM_DATALINK 2
 #define inc(k) if(k<MAX_SEQ) k = k + 1; else k = 0;
 
+#define MAX_SHARE_SEQ 999
+
 #define SENDER  1
 #define RECEIVER  0
 #define TaihouDaisuki 1
 
-pid_t getPidByName(char *task_name);
+pid_t getPidByName(const char * const task_name);
 
 typedef unsigned int seq_nr;    // 发送序号
 
@@ -59,9 +61,9 @@ typedef enum {
 } layer_status;
 
 typedef struct {
-    frame_kind kind,// 帧类型
-    seq_nr  seq,    // 发送序号
-    seq_nr  ack,    // 接受序号
+    frame_kind kind;// 帧类型
+    seq_nr  seq;    // 发送序号
+    seq_nr  ack;    // 接受序号
     packet  info;   // 数据
 } frame;
 

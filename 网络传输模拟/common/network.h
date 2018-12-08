@@ -1,10 +1,16 @@
 #ifndef NETWORK
 #define NETWORK
 
+#define PADbyte 0
+
+#include <unistd.h>
 #include <cstdlib>
+
 #include "common.h"
 
 using namespace std;
+
+const char EndPacket[MAX_PKT] = {0};
 
 class Network {
 private:
@@ -22,4 +28,5 @@ public:
     static void sig_enable_handle(int signal);
     static void sig_disable_handle(int signal);
 };
+
 #endif // NETWORK
