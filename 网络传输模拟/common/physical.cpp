@@ -40,6 +40,7 @@ int data_exchange(const int side, const int pid, const int msgid, const int sock
 
     struct Message msg_data;
 
+    cout << "Taihou = " << TaihouDaisuki << endl;
     while(TaihouDaisuki)
     {
         readfds = sockfds;
@@ -77,6 +78,8 @@ int data_exchange(const int side, const int pid, const int msgid, const int sock
             }
             return SOCKET_CLOSE;
         }
+
+        cout << "Ready to Read or Write" << endl;
 
         if(FD_ISSET(sockfd, &readfds))
         {
@@ -149,7 +152,6 @@ int data_exchange(const int side, const int pid, const int msgid, const int sock
                 else if (write_res == WRITE_ERROR)
                     return WRITE_ERROR;
             }
-            
         }
     }
 
