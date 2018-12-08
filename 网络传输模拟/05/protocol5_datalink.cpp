@@ -1,6 +1,6 @@
 #include "../common/datalink.h"
 
-#define MAX_SEQ 1 // 窗口大小
+#define MAX_SEQ 100 // 窗口大小
 
 int main()
 {
@@ -11,7 +11,6 @@ int main()
     frame r;
     packet buffer[MAX_SEQ + 1];
     seq_nr nbuffered;
-    seq_nr i;
     event_type event;
 
     dl.enable_network_layer();
@@ -47,18 +46,21 @@ int main()
                 break;
             case cksum_err:
                 break;
-            case timeout:
+            case timeout:   // 回退n
                 next_frame_to_send = ack_expected;
-                
+                for (seq_nr i = 1; i <= nbuffered; i++)
+                {
+                    dl.stop_timer(next_frame_to_send);  // 避免重复计时
+                    dl.send_data(next_frame_to_send, frame_expected, buffer);
+                    inc(next_frame_to_send);
+                }
                 break;
         }   // end of switch
-
-        // 发送新包
-        s.info = buffer;
-        s.seq = next_frame_to_send;
-        s.ack = 1 - frame_expected;
-        dl.to_physical_layer(&s);
-        dl.start_timer(s.seq);
+        
+        if (nbuffered < MAX_SEQ)
+            dl.enable_network_layer();
+        else
+            dl.disable_network_layer();
     }
 
     return 0;
