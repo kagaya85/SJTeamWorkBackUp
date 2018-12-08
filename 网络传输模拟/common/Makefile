@@ -33,18 +33,14 @@ all: $(NETWORK-O) $(DATALINK-O) $(PHYSICAL-O)
 # $^-all prerequisites
 # $<-first prerequisite
 
-$(NETWORK-O): $(NETWORK-SRC) $(NETWORK-H) $(COMMON-O)
-	$(CC) $(FLAGS) -c $< -o $@
+$(NETWORK-O): $(NETWORK-SRC) $(NETWORK-H) $(COMMON-SRC) $(COMMON-H)
+	$(CC) $(FLAGS) -c $^ -o $@
 
-$(DATALINK-O): $(DATALINK-SRC) $(DATALINK-H) $(COMMON-O)
-	$(CC) $(FLAGS) -c $< -o $@
+$(DATALINK-O): $(DATALINK-SRC) $(DATALINK-H) $(COMMON-SRC) $(COMMON-H)
+	$(CC) $(FLAGS) -c $^ -o $@
 
-$(PHYSICAL-O): $(PHYSICAL-SRC) $(PHYSICAL-H) $(COMMON-O)
-	$(CC) $(FLAGS) -c $< -o $@
-
-
-$(COMMON-O): $(COMMON-SRC) $(COMMON-H)
-	$(CC) $(FLAGS) -c $< -o $@
+$(PHYSICAL-O): $(PHYSICAL-SRC) $(PHYSICAL-H) $(COMMON-SRC) $(COMMON-H)
+	$(CC) $(FLAGS) -c $^ -o $@
 
 clean:
 	$(RM) *.o
