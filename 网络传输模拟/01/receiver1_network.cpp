@@ -12,8 +12,9 @@ int main(const int argc, const char* argv[])
     while(pid < 0)
     {
         sleep(1);
-        pid = getPidByName("datalink");
+        pid = getPidByName("datal");
     }
+    cout << "Network: " << "get datalink pid " << pid << endl;
 
     if(argc != 2)
 	{

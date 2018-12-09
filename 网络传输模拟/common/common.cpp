@@ -3,8 +3,10 @@
 #include <unistd.h>
 #include <dirent.h>
 #include <string.h>
-
+#include <iostream>
 #include "common.h"
+
+using namespace std;
 
 pid_t getPidByName(const char * const task_name)
 {
@@ -18,7 +20,7 @@ pid_t getPidByName(const char * const task_name)
     char cur_task_name[50];
     char buf[BUF_SIZE];
 
-    dir = opendir("/proc"); 
+    dir = opendir("/proc");
     if (NULL != dir)
     {
         while ((ptr = readdir(dir)) != NULL) //循环读取/proc下的每一个文件/文件夹
@@ -28,7 +30,7 @@ pid_t getPidByName(const char * const task_name)
                 continue;
             if (DT_DIR != ptr->d_type)
                 continue;
-        
+
             sprintf(filepath, "/proc/%s/status", ptr->d_name);//生成要读取的文件的路径
             fp = fopen(filepath, "r");
             if (NULL != fp)
@@ -40,7 +42,10 @@ pid_t getPidByName(const char * const task_name)
                 sscanf(buf, "%*s %s", cur_task_name);
 
                 //如果文件内容满足要求则打印路径的名字（即进程的PID）
-                if (!strstr(cur_task_name, task_name)){
+                if (strstr(cur_task_name, task_name))
+                {
+                    // cout << "Datalink: cur_task_name " << cur_task_name << endl;
+                    // cout << "Datalink: task_name " << task_name << endl;
                     pid = atoi(ptr->d_name);
                     // sscanf(ptr->d_name, "%d", pid);
                     return pid;
