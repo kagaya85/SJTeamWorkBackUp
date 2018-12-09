@@ -117,7 +117,7 @@ int Network::from_datalink_layer(packet *pkt)
         close(fd);
         exit(EXIT_FAILURE);
     }
-    cout << "Network: " << "read from datalink \"" << "\"" << endl; 
+    cout << "Network: " << "read from datalink \"" << fileName << "\"" << endl; 
     close(fd);
     ret = remove(fileName);
     if(ret < 0)
