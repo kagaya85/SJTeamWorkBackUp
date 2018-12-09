@@ -51,6 +51,7 @@ Datalink::~Datalink()
         delete header;
         header = p;
     }
+    msgctl(msgid, IPC_RMID, NULL);
 }
 
 void Datalink::start_timer(seq_nr k)

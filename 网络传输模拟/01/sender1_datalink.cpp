@@ -24,10 +24,11 @@ int main()
 
     while(true)
     {
-        // cout << "datalink read from network" << endl;
+        pid = getPidByName("netwo");
+        if(pid < 0)
+            return 0;
         dl.from_network_layer(&buffer);
         s.info = buffer;
-        // cout << "datalink write to physical" << endl;
         dl.to_physical_layer(&s);
     }
 

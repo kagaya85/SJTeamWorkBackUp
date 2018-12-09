@@ -22,13 +22,21 @@ int main()
     }
     cout << "Datalink: " << "get physical pid " << pid << endl;
 
+    struct msqid_ds msgbuf;
+
     while(true)
     {
-        //cout << "datalink start wait" << endl;
         dl.wait_for_event(&event);
-        //cout << "datalink read from physical" << endl;
         dl.from_physical_layer(&r);
-        //cout << "datalink write to network" << endl;
+        pid = getPidByName("netwo");
+        if(pid < 0)
+        {
+            rc = msgctl(msqid, IPC_STAT, &msgbuf);
+            if(msgbuf.msg_qnum == 0)
+                return 0;
+            else
+                sleep(5);
+        }
         dl.to_network_layer(&r.info);
     }
 

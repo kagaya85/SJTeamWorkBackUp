@@ -99,18 +99,14 @@ int data_exchange(const int side, const pid_t pid, const int msgid, const int so
             if (_snds == -1)
                 return TO_DATALINK_ERROR;
 
-            cout << (side == SENDER ? "SENDER " : "RECEIVER ");
-            cout << "Physical send to datalink layer" << endl;
-
             //send sig to DataLink_layer
             int SIG_OK;
             cout << "SIG to pid = " << pid << endl;
             do
             {
+                errno = 0;
                 SIG_OK = kill(pid, SIG_FRAME_ARRIVAL);
-                cout << "SIG_OK = " << SIG_OK << ", errno = " << strerror(errno) << endl;
             }while (SIG_OK && errno == EINTR);
-            cout << "SIG send finish" << endl;
             if(SIG_OK == -1)
             {
                 cerr << (side == SENDER ? "SENDER " : "RECEIVER ");

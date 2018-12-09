@@ -22,7 +22,7 @@
 #define FROM_DATALINK 2
 #define inc(k) if(k<MAX_SEQ) k = k + 1; else k = 0;
 
-#define MAX_SHARE_SEQ 999
+#define MAX_SHARE_SEQ 9999
 
 #define SENDER  1
 #define RECEIVER  0

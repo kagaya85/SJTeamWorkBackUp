@@ -37,7 +37,6 @@ int main(const int argc, const char* argv[])
     while(TaihouDaisuki)
     {
         int res = NetworkLayer.from_datalink_layer(&Curpacket);
-        cout << "Receiver Network: res = " << res << endl;
         if(res == -1) // from datalink timeout
         {
             unsigned int LastSec = 1000000;

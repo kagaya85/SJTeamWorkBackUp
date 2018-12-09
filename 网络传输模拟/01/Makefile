@@ -78,10 +78,10 @@ clean:
 
 receiver:
 	./receiver1_datalink &
-	./receiver1_network receiver1.cpp &
+	./receiver1_network ALL_recv.txt &
 	./receiver1_physical 4000 &
 
 sender:
 	./sender1_datalink &
-	./sender1_network receiver1_datalink.cpp &
-	./sender1_physical 192.168.137.64 4000 &
+	./sender1_network ALL.txt &
+	./sender1_physical 192.168.137.39 4000 &
