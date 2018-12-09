@@ -26,9 +26,9 @@ int main()
 
     while(true)
     {
-        pid = getPidByName("netwo");
-        if(pid < 0)
-            return 0;
+        // pid = getPidByName("netwo");
+        // if(pid < 0)
+        //     return 0;
         dl.from_network_layer(&buffer);
         s.info = buffer;
         dl.to_physical_layer(&s);

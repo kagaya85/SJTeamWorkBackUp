@@ -27,9 +27,9 @@ int main()
     {
         dl.wait_for_event(&event);
         dl.from_physical_layer(&r);
-        pid = getPidByName("netwo");
-        if(pid < 0)
-                return 0;
+        // pid = getPidByName("netwo");
+        // if(pid < 0)
+        //         return 0;
         dl.to_network_layer(&r.info);
     }
 
