@@ -12,6 +12,7 @@ int main()
     packet buffer[MAX_SEQ + 1];
     seq_nr nbuffered;
     event_type event;
+    dl.wait_others();    
 
     dl.enable_network_layer();
     ack_expected = 0;
