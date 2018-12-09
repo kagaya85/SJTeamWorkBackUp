@@ -89,4 +89,4 @@ receiver:
 sender:
 	./sender3_datalink &
 	./sender3_network xldg.txt &
-	./sender3_physical 192.168.137.64 4000 &
+	./sender3_physical 192.168.137.39 4000 &
