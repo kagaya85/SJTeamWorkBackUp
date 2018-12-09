@@ -7,6 +7,8 @@ int main()
     packet buffer;
     event_type event;
 
+    dl.wait_others();    
+
     while(true)
     {
         dl.from_network_layer(&buffer);

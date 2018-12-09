@@ -10,6 +10,8 @@ int main()
     frame r, s;
     packet buffer;
     event_type event;
+    
+    dl.wait_others();    
 
     next_frame_to_send = 0;
     frame_expected = 0;

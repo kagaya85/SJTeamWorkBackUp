@@ -8,6 +8,8 @@ int main()
     frame s;
     packet buffer;
     event_type event;
+    
+    dl.wait_others();    
 
     next_frame_to_send = 0;
     dl.from_network_layer(&buffer);

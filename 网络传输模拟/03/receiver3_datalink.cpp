@@ -8,6 +8,8 @@ int main()
     frame r, s;
     event_type event;
 
+    dl.wait_others();    
+
     frame_expected = 0;
     while(true)
     {
