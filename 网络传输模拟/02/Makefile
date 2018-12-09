@@ -30,23 +30,20 @@ NETWORK-SND-SRC = sender2_$(NETWORK-NAME).cpp
 NETWORK-REC-SRC = receiver2_$(NETWORK-NAME).cpp
 NETWORK-SND-TARGET = sender2_$(NETWORK-NAME)
 NETWORK-REC-TARGET = receiver2_$(NETWORK-NAME)
-NETWORK-O = $(ROUTE)$(NETWORK-NAME).o
 
 DATALINK-NAME = datalink
 DATALINK-SND-SRC = sender2_$(DATALINK-NAME).cpp
 DATALINK-REC-SRC = receiver2_$(DATALINK-NAME).cpp
 DATALINK-SND-TARGET = sender2_$(DATALINK-NAME)
 DATALINK-REC-TARGET = receiver2_$(DATALINK-NAME)
-DATALINK-O = $(ROUTE)$(DATALINK-NAME).o
 
 PHYSICAL-NAME = physical
 PHYSICAL-SND-SRC = sender2_$(PHYSICAL-NAME).cpp
 PHYSICAL-REC-SRC = receiver2_$(PHYSICAL-NAME).cpp
 PHYSICAL-SND-TARGET = sender2_$(PHYSICAL-NAME)
 PHYSICAL-REC-TARGET = receiver2_$(PHYSICAL-NAME)
-PHYSICAL-O = $(ROUTE)$(PHYSICAL-NAME).o
 
-.PHONY: clean
+.PHONY: all clean receiver sender
 	#avoid to make clean.*
 
 
@@ -80,3 +77,13 @@ clean:
 	 	  $(PHYSICAL-SND-TARGET) $(PHYSICAL-REC-TARGET) \
 		  *.o
 	$(RMRF) $(toDatalinkCache) $(toNetworkCache)
+
+receiver:
+	./receiver2_datalink &
+	./receiver2_network xldg_rec.txt &
+	./receiver2_physical 4000 &
+
+sender:
+	./sender2_datalink &
+	./sender2_network xldg.txt &
+	./sender2_physical 192.168.137.64 4000 &

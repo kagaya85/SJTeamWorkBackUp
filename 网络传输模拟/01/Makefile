@@ -78,10 +78,11 @@ clean:
 
 receiver:
 	./receiver1_datalink &
-	./receiver1_network ywwuyi_rec.mp4 &
+	./receiver1_network xldg_rec.txt &
 	./receiver1_physical 4000 &
 
 sender:
 	./sender1_datalink &
-	./sender1_network ywwuyi.mp4 &
+	./sender1_network xldg.txt &
 	./sender1_physical 192.168.137.64 4000 &
+	
