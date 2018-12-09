@@ -32,6 +32,7 @@ int data_exchange(const int side, const pid_t pid, const int msgid, const int so
     {
         readfds = sockfds;
         writefds = sockfds;
+        // cout << "2" << endl;
         do
         {
             errno = 0;
@@ -68,6 +69,7 @@ int data_exchange(const int side, const pid_t pid, const int msgid, const int so
             return SOCKET_CLOSE;
         }
 
+
         if(FD_ISSET(sockfd, &readfds))
         {
             int read_res;
@@ -85,7 +87,7 @@ int data_exchange(const int side, const pid_t pid, const int msgid, const int so
             }
             else
                 buffer_rec_len = NODatapackLen;
-
+            // cout << "3" << endl;
             cout << "[" << read_cnt << "]";
             cout << (side == SENDER ? "SENDER " : "RECEIVER ");
             cout << "Physical: receive data " << buffer_rec_len << " byte(s)" << endl;
@@ -97,7 +99,7 @@ int data_exchange(const int side, const pid_t pid, const int msgid, const int so
             do
             {
                 errno = 0;
-                cout << "msgid = " << msgid << endl;
+                // cout << "msgid = " << msgid << endl;
                 _snds = msgsnd(msgid, (void *)&msg_snd, MSGBUFF_SIZE, 0);
             }while(_snds == -1 && errno == EINTR);
             if (_snds == -1)
@@ -137,6 +139,8 @@ int data_exchange(const int side, const pid_t pid, const int msgid, const int so
                     {
                          //cout << (side == SENDER ? "SENDER " : "RECEIVER ");
                          //cout << "Physical get no data from datalink layer" << endl;
+                        // cout << "4" << endl;
+                        sleep(1);
                         break;
                     }
                     else
@@ -159,7 +163,8 @@ int data_exchange(const int side, const pid_t pid, const int msgid, const int so
                 else if (write_res == WRITE_ERROR)
                     return SOCKET_ERROR;
 
-                cout << "[" << write_cnt << "]";
+                // cout << "5" << endl;
+                cout << "[" << write_cnt << "] ";
                 cout << "Physical: write data " << (pure_pack == PureSIGpack ? NODatapackLen : DatapackLen) << " byte(s)" << endl;
                 ++write_cnt; ////////////////////
             }
@@ -223,6 +228,6 @@ unsigned int calc_bitstream(const char* const Bitstream, const int Len)
 {
     unsigned int res = 0;
     for(int i = 0; i < Len; ++i)
-        res = (res << 4) + Bitstream[i];
+        res = (res << 4) + (unsigned char)Bitstream[i];
     return res;
 }

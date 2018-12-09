@@ -43,7 +43,7 @@ PHYSICAL-REC-SRC = receiver3_$(PHYSICAL-NAME).cpp
 PHYSICAL-SND-TARGET = sender3_$(PHYSICAL-NAME)
 PHYSICAL-REC-TARGET = receiver3_$(PHYSICAL-NAME)
 
-.PHONY: clean
+.PHONY: clean sender receiver
 	#avoid to make clean.*
 
 

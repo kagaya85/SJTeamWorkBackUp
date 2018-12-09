@@ -17,12 +17,14 @@ int main()
     {
         s.info = buffer;
         s.seq = next_frame_to_send;
+        cout << "Datalink: " << "send seq " << s.seq << endl;
         dl.to_physical_layer(&s);
         dl.start_timer(s.seq);
         dl.wait_for_event(&event);
         if (event == frame_arrival)
         {
             dl.from_physical_layer(&s);
+            cout << "Datalink: " << "receive ACK " << s.ack << endl;
             if (s.ack == next_frame_to_send)
             {
                 dl.stop_timer(s.ack);
@@ -30,15 +32,16 @@ int main()
                 inc(next_frame_to_send);
             }
             else
-                continue;   // 閲嶅彂
+                continue;   // 重发
         }
         else if (event == cksum_err)
         {
-                continue;
+            continue;
         }
         else if (event == timeout)
         {
-                continue;
+            dl.eventQueue.pop();    // 将seq号pop出来
+            continue;
         }
         else
             cerr << "event error" << endl;

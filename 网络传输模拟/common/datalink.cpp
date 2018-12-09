@@ -7,7 +7,13 @@ event_type Datalink::datalinkEvent;
 unsigned int Datalink::arrivedPacketNum;    // 来自网络层已经到达的包数量
 unsigned int Datalink::arrivedFrameNum;    // 来自物理层已经到达的帧数量
 seq_nr Datalink::timeoutSeq;
-layer_status Datalink::NetworkStatus;
+Status Datalink::NetworkStatus;
+queue<int> Datalink::eventQueue;
+// Status Datalink::frameArrivalEvent;
+// Status Datalink::cksumErrEvent;
+// Status Datalink::timeoutEvent;
+// Status Datalink::networkLayerReadyEvent;
+// Status Datalink::ackTimeoutEvent;
 
 Datalink::Datalink()
 {
@@ -125,6 +131,7 @@ void Datalink::stop_timer(seq_nr k)
         p = header;
         header = header->next;
         delete header;
+        cout << "Datalink: " << "stop timer seq " << k << endl;
         return;
     }
 
@@ -137,10 +144,11 @@ void Datalink::stop_timer(seq_nr k)
             p->next = q->next;
             delete q;
             q = p->next;
+            cout << "Datalink: " << "stop timer seq " << k << endl;
             return;
         }
     }
-    cout << "Datalink: " << "stop timer seq " << k << endl;
+
 }
 
 void Datalink::enable_network_layer()
@@ -237,17 +245,36 @@ void Datalink::stop_ack_timer()
 void Datalink::wait_for_event(event_type *event)
 {
     cout << "Datalink: " << "wait for event" << endl;
-    
-    if(*event != datalinkEvent) // 在wait_for_event之外有信号中断
-    {
-        *event = datalinkEvent;
-        return;
-    }
-    do
-    {
+
+    while(eventQueue.empty())    
         pause();
-    } while (datalinkEvent == no_event);
-    *event = datalinkEvent;
+
+    *event = (event_type)eventQueue.front();
+    eventQueue.pop();
+
+    cout << "Datalink: handle event ";
+    switch(*event)
+    {
+        case no_event:
+            cout << "no_event" << endl;
+            break;
+        case frame_arrival:
+            cout << "frame_arrival" << endl;
+            break;
+        case cksum_err:
+            cout << "cksum_err" << endl;
+            break;
+        case timeout:
+            cout << "timeout" << endl;
+            break;
+        case network_layer_ready:
+            cout << "network_layer_ready" << endl;
+            break;
+        case ack_timeout:
+            cout << "ack_timeout" << endl;
+            break;
+    }
+
     return;
 }
 
@@ -270,13 +297,13 @@ void Datalink::sigalarm_handle(int signal)
     {
         if (header->fkind == DataFrame)
         {
-            datalinkEvent = timeout;
-            timeoutSeq = header->seq;
+            eventQueue.push(timeout);
+            eventQueue.push(header->seq);   // 将超时的seq号紧随其后
             cout << "Datalink: " << "seq "<< timeoutSeq <<" timeout" << endl;
         }
         else if (header->fkind == AckFrame)
         {
-            datalinkEvent = ack_timeout;
+            eventQueue.push(ack_timeout);
             cout << "Datalink: " << "ack timeout" << endl;
         }
         TimerNode *p;
@@ -291,14 +318,14 @@ void Datalink::sigalarm_handle(int signal)
 void Datalink::sig_frame_arrival_handle(int signal)
 {
     arrivedFrameNum++;
-    datalinkEvent = frame_arrival;
+    eventQueue.push(frame_arrival);
     cout << "Datalink: get signal SIG_FRAME_ARRIVAL" << endl;
 }
 
 void Datalink::sig_network_layer_ready_handle(int signal)
 {
     arrivedPacketNum++;
-    datalinkEvent = network_layer_ready;
+    eventQueue.push(network_layer_ready);
     NetworkStatus = Enable;
     cout << "Datalink: get signal SIG_NETWORKLAYER_READY" << endl;
 }
@@ -447,17 +474,20 @@ void Datalink::from_physical_layer(frame *frm)
 void Datalink::to_physical_layer(frame *frm)
 {
     Message msg;
-    int tmpkind = frm->kind;
+    int tmpkind;
+    seq_nr tmpack;
+    seq_nr tmpseq;
 
-    tmpkind = htonl(tmpkind);
-    frm->ack = htonl(frm->ack);
-    frm->seq = htonl(frm->seq);
+    tmpkind = htonl(frm->kind);
+    tmpack = htonl(frm->ack);
+    tmpseq = htonl(frm->seq);
 
     memcpy(msg.data, &tmpkind, 4);
-    memcpy(&msg.data[4], &(frm->seq), 4);
-    memcpy(&msg.data[8], &(frm->ack), 4);
+    memcpy(&msg.data[4], &tmpseq, 4);
+    memcpy(&msg.data[8], &tmpack, 4);
     memcpy(&msg.data[12], frm->info.data, MAX_PKT);
     msg.msg_type = FROM_DATALINK;
+    
     // 向队列发送
     int ret;
     do
@@ -468,15 +498,13 @@ void Datalink::to_physical_layer(frame *frm)
     
     struct msqid_ds msgbuf;
     msgctl(msgid, IPC_STAT, &msgbuf);
-    cout << "Datalink: " << "Send frame to physical layer Msgbuf.msg_qnum is " << msgbuf.msg_qnum << endl;
+    cout << "Datalink: " << "Send frame to physical layer and The msg_qnum is " << msgbuf.msg_qnum << endl;
     
     if (ret < 0)
     {
         perror("msgsnd failed");
         exit(EXIT_FAILURE);
     }
-
-    cout << "Datalink: " << "send frame to physical layer" << endl;
 
     return;
 }
@@ -530,3 +558,59 @@ void Datalink::wait_others()
     }
     cout << "Datalink: " << "get physical pid " << pid << endl;
 }
+
+/* 事件判断函数 */
+// bool Datalink::is_frameArrivalEvent()
+// {
+//     if (frameArrivalEvent) // if enable
+//     {
+//         frameArrivalEvent = Disable;
+//         return true;
+//     }
+//     else
+//         return false;
+// }
+
+// bool Datalink::is_cksumErrEvent()
+// {
+//     if (cksumErrEvent) // if enable
+//     {
+//         cksumErrEvent = Disable;
+//         return true;
+//     }
+//     else
+//         return false;
+// }
+
+// bool Datalink::is_timeoutEvent()
+// {
+//     if (timeoutEvent) // if enable
+//     {
+//         timeoutEvent = Disable;
+//         return true;
+//     }
+//     else
+//         return false;
+// }
+
+// bool Datalink::is_networkLayerReadyEvent()
+// {
+//     if (networkLayerReadyEvent) // if enable
+//     {
+//         networkLayerReadyEvent = Disable;
+//         return true;
+//     }
+//     else
+//         return false;
+// }
+
+// bool Datalink::is_ackTimeoutEvent()
+// {
+//     if (ackTimeoutEvent) // if enable
+//     {
+//         ackTimeoutEvent = Disable;
+//         return true;
+//     }
+//     else
+//         return false;
+// }

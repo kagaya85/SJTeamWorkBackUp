@@ -45,7 +45,7 @@ int main(const int argc, const char* argv[])
             continue;
         }
 
-        cout << "Receiver Network: Receive packet from datalink" << endl;
+        // cout << "Receiver Network: Receive packet from datalink" << endl;
 
         if(isEndPacket(Curpacket))
         {

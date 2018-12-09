@@ -12,6 +12,7 @@
 #include <sys/time.h>
 #include <sys/file.h>
 #include <errno.h>
+#include <queue>
 #include "common.h"
 
 #define TIMEOUT_LIMIT 10000 // 单位ms 10s 
@@ -34,9 +35,16 @@ private:
     static unsigned int arrivedPacketNum;    // 来自网络层已经到达的包数量
     static unsigned int arrivedFrameNum;    // 来自物理层已经到达的帧数量
     static seq_nr timeoutSeq;
-    static layer_status NetworkStatus;   // 网络层状态
+    static Status NetworkStatus;   // 网络层状态
     int msgid;
+    // 事件开关
+    // static Status frameArrivalEvent;
+    // static Status cksumErrEvent;
+    // static Status timeoutEvent;
+    // static Status networkLayerReadyEvent;
+    // static Status ackTimeoutEvent;
 public:
+    static queue<int> eventQueue;
     bool no_nak;
     Datalink();
     ~Datalink();
@@ -61,6 +69,12 @@ public:
     static void sigalarm_handle(int signal);
     static void sig_frame_arrival_handle(int signal);
     static void sig_network_layer_ready_handle(int signal);
+    // /* 事件判断函数 */
+    // bool is_frameArrivalEvent();
+    // bool is_cksumErrEvent();
+    // bool is_timeoutEvent();
+    // bool is_networkLayerReadyEvent();
+    // bool is_ackTimeoutEvent();
 };
 
 #endif // DATALINK

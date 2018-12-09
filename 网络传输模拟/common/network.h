@@ -29,12 +29,12 @@ class Network {
 private:
     seq_nr NetworkDatalinkSeq;
     seq_nr DatalinkNetworkSeq;
-    static layer_status NetworkStatus;
+    static Status NetworkStatus;
 public:
     Network();
     ~Network();
     void seq_inc(seq_nr &k);
-    layer_status status();
+    Status status();
     void to_datalink_layer(packet *pkt);
     int from_datalink_layer(packet *pkt);
     void network_layer_ready();

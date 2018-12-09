@@ -56,9 +56,9 @@ typedef enum {
 } event_type;
 
 typedef enum {
-    Enable,
-    Disable
-} layer_status;
+    Disable,    // Disable == 0
+    Enable
+} Status;
 
 typedef struct {
     frame_kind kind;// Ö¡ÀàĞÍ

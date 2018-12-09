@@ -2,7 +2,7 @@
 
 using namespace std;
 
-layer_status Network::NetworkStatus;
+Status Network::NetworkStatus;
 
 Network::Network()
 {
@@ -26,7 +26,7 @@ void Network::seq_inc(seq_nr &k)
         k = 0;
 }
 
-layer_status Network::status()
+Status Network::status()
 {
     return NetworkStatus;
 }
