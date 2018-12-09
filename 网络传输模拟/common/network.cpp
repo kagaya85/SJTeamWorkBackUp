@@ -118,6 +118,9 @@ int Network::from_datalink_layer(packet *pkt)
     }
     
     close(fd);
+    ret = remove(fileName);
+    if(ret < 0)
+        cerr << "Network: " << "delete file \"" << fileName << "\" error" << endl;
     seq_inc(DatalinkNetworkSeq);
     return 0;
 }
