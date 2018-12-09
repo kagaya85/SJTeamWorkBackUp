@@ -76,7 +76,8 @@ clean:
 	 	  $(DATALINK-SND-TARGET) $(DATALINK-REC-TARGET) \
 	 	  $(PHYSICAL-SND-TARGET) $(PHYSICAL-REC-TARGET) \
 		  *.o
-	$(RMRF) $(toDatalinkCache) $(toNetworkCache)
+	$(RMRF) $(NetworkCacheDir) $(NetworkCacheDir)
+
 
 receiver:
 	./receiver2_datalink &

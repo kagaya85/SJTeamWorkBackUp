@@ -6,6 +6,7 @@ int main()
     frame r, s;
     event_type event;
 
+    dl.wait_others();    
     s.kind = AckFrame;
 
     while(true)

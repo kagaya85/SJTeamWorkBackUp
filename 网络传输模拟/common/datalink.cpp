@@ -512,3 +512,21 @@ void Datalink::send_data(frame_kind fk, seq_nr frame_nr, seq_nr frame_expected, 
     stop_ack_timer();
 }
 
+void Datalink::wait_others()
+{
+    // 等待另外两个进程开启
+    pid_t pid = -1;
+    while(pid < 0)
+    {
+        sleep(1);
+        pid = getPidByName("netwo");
+    }
+    cout << "Datalink: " << "get network pid " << pid << endl;
+    pid = -1;
+    while(pid < 0)
+    {
+        sleep(1);
+        pid = getPidByName("physi");
+    }
+    cout << "Datalink: " << "get physical pid " << pid << endl;
+}

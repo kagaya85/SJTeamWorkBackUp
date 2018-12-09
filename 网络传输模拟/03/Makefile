@@ -79,4 +79,14 @@ clean:
 	 	  $(DATALINK-SND-TARGET) $(DATALINK-REC-TARGET) \
 	 	  $(PHYSICAL-SND-TARGET) $(PHYSICAL-REC-TARGET) \
 		  *.o
-	$(RMRF) $(toDatalinkCache) $(toNetworkCache)
+	$(RMRF) $(NetworkCacheDir) $(NetworkCacheDir)
+
+receiver:
+	./receiver3_datalink &
+	./receiver3_network xldg_rec.txt &
+	./receiver3_physical 4000 &
+
+sender:
+	./sender3_datalink &
+	./sender3_network xldg.txt &
+	./sender3_physical 192.168.137.64 4000 &

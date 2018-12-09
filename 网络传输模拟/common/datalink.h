@@ -54,6 +54,7 @@ public:
     void to_physical_layer(frame *frm);
     void send_data(seq_nr frame_nr, seq_nr frame_expected, packet bufferp[], int max_seq);
     void send_data(frame_kind fk, seq_nr frame_nr, seq_nr frame_expected, packet buffer[], int max_seq, int nr_bufs);
+    void wait_others();
     seq_nr get_timeout_seq();
     static bool between(seq_nr a, seq_nr b, seq_nr c);
     /* 信号处理函数 */
