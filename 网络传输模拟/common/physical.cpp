@@ -24,7 +24,7 @@ int data_exchange(const int side, const pid_t pid, const int msgid, const int so
     int _rs, _ws, ressel;
     int _rcvs, _snds;
 
-    int read_cnt = 0, write_cnt = 0;
+    unsigned int read_cnt = 0, write_cnt = 0;
 
     struct Message msg_data;
 
@@ -86,10 +86,10 @@ int data_exchange(const int side, const pid_t pid, const int msgid, const int so
             else
                 buffer_rec_len = NODatapackLen;
 
-            inc(read_cnt);
             cout << "[" << read_cnt << "]" << endl;
             cout << (side == SENDER ? "SENDER " : "RECEIVER ");
             cout << "Physical: receive data " << buffer_rec_len << " byte(s)" << endl;
+            ++read_cnt; ////////////////////
 
             // upload message to DataLink_layer
             msg_data.msg_type = FROM_PHYSICAL;
@@ -152,14 +152,16 @@ int data_exchange(const int side, const pid_t pid, const int msgid, const int so
                 if (calc_bitstream(buffer_snd + FramkindLen, SndNoLen) == PureSIGpack)
                 {
                     write_res = write_bitstream(side, sockfd, NODatapackLen, buffer_snd);
-                    inc(write_cnt);
                     cout << "[" << write_cnt << "]" << endl;
                     cout << "Physical: write data " << SndNoLen << " byte(s)" << endl;
+                    ++write_cnt; ////////////////////
                 }
                 else
                 {
                     write_res = write_bitstream(side, sockfd, DatapackLen, buffer_snd);
+                    cout << "[" << write_cnt << "]" << endl;
                     cout << "Physical: write data " << DatapackLen << " byte(s)" << endl;
+                    ++write_cnt; ////////////////////
                 }
                 if (write_res == WRITE_CLOSE)
                     return SOCKET_CLOSE;
