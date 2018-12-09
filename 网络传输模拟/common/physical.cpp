@@ -98,14 +98,14 @@ int data_exchange(const int side, const pid_t pid, const int msgid, const int so
             do
             {
                 errno = 0;
+                cout << "msgid = " << msgid << endl;
                 _snds = msgsnd(msgid, (void *)&msg_data, MSGBUFF_SIZE, 0);
             }while(_snds == -1 && errno == EINTR);
             if (_snds == -1)
                 return TO_DATALINK_ERROR;
-
-            //send sig to DataLink_layer
+            // send sig to DataLink_layer
             int SIG_OK;
-            //cout << "SIG to pid = " << pid << endl;
+            // cout << "SIG to pid = " << pid << endl;
             do
             {
                 errno = 0;
@@ -135,8 +135,8 @@ int data_exchange(const int side, const pid_t pid, const int msgid, const int so
                 {
                     if(errno == ENOMSG)
                     {
-                        // cout << (side == SENDER ? "SENDER " : "RECEIVER ");
-                        // cout << "Physical get no data from datalink layer" << endl;
+                         //cout << (side == SENDER ? "SENDER " : "RECEIVER ");
+                         //cout << "Physical get no data from datalink layer" << endl;
                         break;
                     }
                     else

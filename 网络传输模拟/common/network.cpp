@@ -34,16 +34,17 @@ layer_status Network::status()
 void Network::to_datalink_layer(packet *pkt)
 {
     char fileName[50];
-    
-    while (access(To_Datalink_Dir, F_OK) == 0)
+    sprintf(fileName, "%s/network_datalink.share.%04d", To_Datalink_Dir, NetworkDatalinkSeq);
+
+    //puts("NL: to start");
+    while (access(fileName, F_OK) == 0)
         sleep(2);   // 文件存在，阻塞等待
+    //puts("NL: to end");
 
     // 建立文件
     mode_t mode = umask(0);
     mkdir(To_Datalink_Dir, 0777);
     
-    sprintf(fileName, "%s/network_datalink.share.%04d", To_Datalink_Dir, NetworkDatalinkSeq);
-
     int fd;
     do
     {
@@ -81,7 +82,6 @@ void Network::to_datalink_layer(packet *pkt)
 int Network::from_datalink_layer(packet *pkt)
 {
     char fileName[50];
-    
     sprintf(fileName, "%s/datalink_network.share.%04d", To_Network_Dir, DatalinkNetworkSeq);
     
     int fd;

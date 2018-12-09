@@ -312,18 +312,20 @@ seq_nr Datalink::get_timeout_seq()
 void Datalink::from_network_layer(packet *pkt)
 {
     char fileName[50];
-    
+    sprintf(fileName, "%s/network_datalink.share.%04d", To_Datalink_Dir, NetworkDatalinkSeq);
+
     if (NetworkStatus == Disable)
     {
         cerr << "network layer disabled" << endl;
         exit(EXIT_FAILURE);
     }
     
-    sprintf(fileName, "%s/network_datalink.share.%04d", To_Datalink_Dir, NetworkDatalinkSeq);
     int fd;
         // 文件不存在循环等待
+    //puts("DL: From start");
     while (access(fileName, F_OK) < 0)
         sleep(1);
+    //puts("DL: From end");
         
     do
     {
@@ -365,14 +367,15 @@ void Datalink::from_network_layer(packet *pkt)
 void Datalink::to_network_layer(packet *pkt)
 {
     char fileName[50];
-    
-    while (access(To_Network_Dir, F_OK) == 0)
+    sprintf(fileName, "%s/datalink_network.share.%04d", To_Network_Dir, DatalinkNetworkSeq);
+
+    //puts("DL: to start");
+    while (access(fileName, F_OK) == 0)
         sleep(2);   // 文件存在，阻塞等待
+    //puts("DL: to end");
 
     mode_t mode = umask(0);
     mkdir(To_Network_Dir, 0777);
-    
-    sprintf(fileName, "%s/datalink_network.share.%04d", To_Network_Dir, DatalinkNetworkSeq);
 
     int fd;
     do
