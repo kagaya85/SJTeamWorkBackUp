@@ -55,8 +55,8 @@ Datalink::~Datalink()
     struct msqid_ds msgbuf;
     while (true) 
     {
-        msgctl(msgid, IPC_STAT, &msgbuf);
-        cout << "Datalink: " << "msgbuf.msg_qnum " << msgbuf.msg_qnum << endl;
+        // msgctl(msgid, IPC_STAT, &msgbuf);
+        // cout << "Datalink: " << "msgbuf.msg_qnum " << msgbuf.msg_qnum << endl;
         if(msgbuf.msg_qnum == 0)
         {
             msgctl(msgid, IPC_RMID, NULL);
@@ -355,6 +355,9 @@ void Datalink::from_network_layer(packet *pkt)
     
     cout << "Datalink: " << "read " << ret << " byte(s) from "<< fileName << endl;
     close(fd);
+    ret = remove(fileName);
+    if(ret < 0)
+        cerr << "Datalink: " << "delete file \"" << filename << "\" error" << endl;
     seq_inc(NetworkDatalinkSeq);
     return; // ok
 }
@@ -459,7 +462,11 @@ void Datalink::to_physical_layer(frame *frm)
         errno = 0;
         ret = msgsnd(msgid, &msg, MSGBUFF_SIZE, 0);
     } while (ret < 0 && errno == EINTR);
-
+    
+    struct msqid_ds msgbuf;
+    msgctl(msgid, IPC_STAT, &msgbuf);
+    cout << "Datalink: " << "Send frame to physical layer Msgbuf.msg_qnum is " << msgbuf.msg_qnum << endl;
+    
     if (ret < 0)
     {
         perror("msgsnd failed");
