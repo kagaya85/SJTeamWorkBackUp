@@ -36,6 +36,7 @@ int main(const int argc, const char* argv[])
     while(TaihouDaisuki)
     {
         int res = NetworkLayer.from_datalink_layer(&Curpacket);
+        cout << "Receiver Network: res = " << res << endl;
         if(res == -1) // from datalink timeout
         {
             unsigned int LastSec = 1000000;
@@ -48,6 +49,7 @@ int main(const int argc, const char* argv[])
 
         if(isEndPacket(Curpacket))
         {
+            cout << "Receiver Network: this is the last packet" << endl;
             //write last packet into file
             int LastPackLen = MAX_PKT;
             RemovePAD(Lastpacket, LastPackLen);
@@ -56,6 +58,7 @@ int main(const int argc, const char* argv[])
         }
         else
         {
+            cout << "Receiver network: this is a common packet" << endl;
             if(!isEndPacket(Lastpacket))
                 fout.write((char *)Lastpacket.data, MAX_PKT);
             Lastpacket = Curpacket;

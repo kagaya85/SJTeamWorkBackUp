@@ -21,7 +21,7 @@ int main(const int argc, char *argv[])
 		return 0;
 	}
 
-    int DatalinkLayer_pid = get_pid_by_name("sender1_datalink");  // here use the datalink proc_name
+    pid_t DatalinkLayer_pid = pid;  // here use the datalink proc_name
     int DatalinkLayer_msgid = link_to_DatalinkLayer(IPC_KEY);
 	if(DatalinkLayer_msgid == -1)
 	{

@@ -81,19 +81,23 @@ int Network::from_datalink_layer(packet *pkt)
 {
     char fileName[50];
     
+    cout << "Number = " << DatalinkNetworkSeq << endl;
     sprintf(fileName, "%s/datalink_network.share.%04d", To_Network_Dir, DatalinkNetworkSeq);
     
     int fd;
     
     // 文件不存在 返回-1
+    cout << "LOOP0 start" << endl;
     while (access(fileName, F_OK) < 0)
         return -1;
 
+    cout << "LOOP1 start" << endl;
     do
     {
         errno = 0;
         fd = open(fileName, O_RDONLY);
     } while (fd < 0 && errno == EINTR);
+    cout << "LOOP1 finish" << endl;
 
     if (fd < 0)
     {
@@ -103,12 +107,14 @@ int Network::from_datalink_layer(packet *pkt)
 
     flock(fd, LOCK_EX);
 
+    cout << "LOOP2 start" << endl;
     int ret;
     do
     {
         errno = 0;
         ret = read(fd, pkt->data, MAX_PKT);
     } while (ret < 0 && errno == EINTR);
+    cout << "LOOP2 finish" << endl;
 
     if (ret < 0)
     {

@@ -2,20 +2,6 @@
 
 using namespace std;
 
-int get_pid_by_name(const char* const proc_name)
-{
-    string COMMAND = "ps -e | grep \'";
-    COMMAND.append(proc_name);
-    COMMAND.append("\' | awk \'{print $1}\'");
-
-    FILE *fp = popen(COMMAND.c_str(), "r");
-    char buffer[10] = {0};
-    fgets(buffer, 10, fp);
-    pclose(fp);
-
-    return atoi(buffer);
-}
-
 int link_to_DatalinkLayer(const int MSG_KEY)
 {
     int msgid = msgget((key_t)MSG_KEY, 0666 | IPC_CREAT);
@@ -27,7 +13,7 @@ int link_to_DatalinkLayer(const int MSG_KEY)
     return msgid;
 }
 
-int data_exchange(const int side, const int pid, const int msgid, const int sockfd)
+int data_exchange(const int side, const pid_t pid, const int msgid, const int sockfd)
 {
     fd_set sockfds, readfds, writefds;
 	FD_ZERO(&sockfds);
@@ -50,6 +36,8 @@ int data_exchange(const int side, const int pid, const int msgid, const int sock
             ressel = select(FD_SETSIZE, &readfds, &writefds, NULL, NULL);
         }while(ressel < 0 && errno == EINTR);
 
+        // cout << (side == SENDER ? "SENDER " : "RECEIVER ");
+        // cout << "Physical select finish, readable = " << FD_ISSET(sockfd, &readfds) << " , writeable = " << FD_ISSET(sockfd, &writefds) << endl;
         if(ressel < 0)
         {
             cerr << (side == SENDER ? "SENDER " : "RECEIVER ");
@@ -96,6 +84,9 @@ int data_exchange(const int side, const int pid, const int msgid, const int sock
             else
                 buffer_rec_len = NODatapackLen;
 
+            cout << (side == SENDER ? "SENDER " : "RECEIVER ");
+            cout << "Physical receive data " << buffer_rec_len << " byte(s)" << endl;
+
             // upload message to DataLink_layer
             msg_data.msg_type = FROM_PHYSICAL;
             //strcpy(msg_data.text, buffer_rec);
@@ -113,10 +104,19 @@ int data_exchange(const int side, const int pid, const int msgid, const int sock
 
             //send sig to DataLink_layer
             int SIG_OK;
+            cout << "SIG to pid = " << pid << endl;
             do
             {
                 SIG_OK = kill(pid, SIG_FRAME_ARRIVAL);
-            }while (SIG_OK);
+                cout << "SIG_OK = " << SIG_OK << ", errno = " << strerror(errno) << endl;
+            }while (SIG_OK && errno == EINTR);
+            cout << "SIG send finish" << endl;
+            if(SIG_OK == -1)
+            {
+                cerr << (side == SENDER ? "SENDER " : "RECEIVER ");
+                cerr << "Physical send SIG to datalink layer failed: " << strerror(errno) << endl;
+                return SOCKET_ERROR;
+            }
         }
 
         if(FD_ISSET(sockfd, &writefds))
@@ -128,31 +128,46 @@ int data_exchange(const int side, const int pid, const int msgid, const int sock
                 {
                     errno = 0;
                     _rcvs = msgrcv(msgid, (void *)&msg_data, MSGBUFF_SIZE, FROM_DATALINK, IPC_NOWAIT);
+                    //cout << "Physical Receiving from datalink..." << endl;
                 }while(_rcvs == -1 && errno == EINTR);
                 
                 if(_rcvs == -1)
                 {
                     if(errno == ENOMSG)
+                    {
+                        // cout << (side == SENDER ? "SENDER " : "RECEIVER ");
+                        // cout << "Physical get no data from datalink layer" << endl;
                         break;
+                    }
                     else
                         return FROM_DATALINK_ERROR; 
                 }
                 memcpy(buffer_snd, msg_data.data, DatapackLen);
 
+                cout << (side == SENDER ? "SENDER " : "RECEIVER ");
+                cout << "Physical receive from datalink layer" << endl;
+
+                cout << (side == SENDER ? "SENDER " : "RECEIVER ");
                 int write_res;
                 if (calc_bitstream(buffer_snd + FramkindLen, SndNoLen) == PureSIGpack)
+                {
                     write_res = write_bitstream(side, sockfd, NODatapackLen, buffer_snd);
+                    cout << "Physical write data " << SndNoLen << " byte(s)" << endl;
+                }
                 else
+                {
                     write_res = write_bitstream(side, sockfd, DatapackLen, buffer_snd);
+                    cout << "Physical write data " << DatapackLen << " byte(s)" << endl;
+                }
                 if (write_res == WRITE_CLOSE)
                     return SOCKET_CLOSE;
                 else if (write_res == WRITE_ERROR)
                     return WRITE_ERROR;
-                
-                cout << (side == SENDER ? "SENDER " : "RECEIVER ");
-                cout << "Physical receive from datalink layer" << endl;
             }
         }
+
+        // cout << (side == SENDER ? "SENDER " : "RECEIVER ");
+        // cout << "Physical GO FOR NEXT ROUND" << endl;
     }
 
     return SOCKET_OK; // this will not be run if it works normally
@@ -169,7 +184,7 @@ int read_bitstream(const int side, const int fd, const int Len, char* const buff
         buffer_p += (_rs > 0 ? _rs : 0);
         if(buffer_p == Len)
             break;
-    } while ((_rs < 0 && (errno == EINTR || errno == EWOULDBLOCK || errno == EAGAIN)) || (buffer_p < Len));
+    } while ((_rs < 0 && (errno == EINTR || errno == EWOULDBLOCK || errno == EAGAIN)) && (buffer_p < Len));
 
     if(_rs == 0)
         return READ_CLOSE;
@@ -192,7 +207,7 @@ int write_bitstream(const int side, const int fd, const int Len, const char* con
         buffer_p += (_ws > 0 ? _ws : 0);
         if(buffer_p == Len)
             break;
-    } while((_ws < 0 && (errno == EINTR || errno == EWOULDBLOCK || errno == EAGAIN)) || (buffer_p < Len));
+    } while((_ws < 0 && (errno == EINTR || errno == EWOULDBLOCK || errno == EAGAIN)) && (buffer_p < Len));
 
     if(_ws == 0)
         return WRITE_CLOSE;

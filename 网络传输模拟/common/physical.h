@@ -44,12 +44,10 @@ enum Write_State
     WRITE_ERROR, WRITE_CLOSE, WRITE_OK
 };
 
-//----------Prework Part----------
-int get_pid_by_name(const char* const proc_name);
 //----------Msgqueue Part----------
 int link_to_DatalinkLayer(const int KEY);
 //----------Socket Part----------
-int data_exchange(const int side, const int pid, const int msgid, const int sockfd);
+int data_exchange(const int side, const pid_t pid, const int msgid, const int sockfd);
 
 unsigned int calc_bitstream(const char* const Bitstream, const int bitstream_length);
 
