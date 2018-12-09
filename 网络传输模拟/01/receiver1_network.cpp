@@ -49,7 +49,7 @@ int main(const int argc, const char* argv[])
 
         if(isEndPacket(Curpacket))
         {
-            cout << "Receiver Network: this is the last packet" << endl;
+            //cout << "Receiver Network: this is the last packet" << endl;
             //write last packet into file
             int LastPackLen = MAX_PKT;
             RemovePAD(Lastpacket, LastPackLen);
@@ -58,7 +58,7 @@ int main(const int argc, const char* argv[])
         }
         else
         {
-            cout << "Receiver network: this is a common packet" << endl;
+            //cout << "Receiver network: this is a common packet" << endl;
             if(!isEndPacket(Lastpacket))
                 fout.write((char *)Lastpacket.data, MAX_PKT);
             Lastpacket = Curpacket;
