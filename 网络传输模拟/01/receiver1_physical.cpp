@@ -95,7 +95,7 @@ int main(const int argc, char *argv[])
             close(sockfd);
             break;
         }
-		else // SOCKET_OK, this will not be run if works correct
+		else // SOCKET_OK, this will not be run if works correctly
 		{
 			cout << "Receiver: Physical Connection Finish" << endl;
             close(sockfd);

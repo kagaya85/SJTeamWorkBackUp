@@ -90,7 +90,7 @@ int main(const int argc, char *argv[])
             close(sockfd);
             break;
         }
-		else // SOCKET_OK, this will not be run if works correct
+		else // SOCKET_OK, this will not be run if works correctly
 		{
 			cout << "Sender: Physical Connection Finish" << endl;
             close(sockfd);

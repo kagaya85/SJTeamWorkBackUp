@@ -162,8 +162,8 @@ int data_exchange(const int side, const pid_t pid, const int msgid, const int so
             }
         }
 
-        // cout << (side == SENDER ? "SENDER " : "RECEIVER ");
-        // cout << "Physical GO FOR NEXT ROUND" << endl;
+        //cout << (side == SENDER ? "SENDER " : "RECEIVER ");
+        //cout << "Physical GO FOR NEXT ROUND" << endl;
     }
 
     return SOCKET_OK; // this will not be run if it works normally
