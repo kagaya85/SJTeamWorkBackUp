@@ -157,7 +157,7 @@ int data_exchange(const int side, const pid_t pid, const int msgid, const int so
                 if (write_res == WRITE_CLOSE)
                     return SOCKET_CLOSE;
                 else if (write_res == WRITE_ERROR)
-                    return WRITE_ERROR;
+                    return SOCKET_ERROR;
 
                 cout << "[" << write_cnt << "]";
                 cout << "Physical: write data " << (pure_pack == PureSIGpack ? NODatapackLen : DatapackLen) << " byte(s)" << endl;
