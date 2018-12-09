@@ -31,7 +31,7 @@ int main()
         pid = getPidByName("netwo");
         if(pid < 0)
         {
-            rc = msgctl(msqid, IPC_STAT, &msgbuf);
+            msgctl(msqid, IPC_STAT, &msgbuf);
             if(msgbuf.msg_qnum == 0)
                 return 0;
             else
