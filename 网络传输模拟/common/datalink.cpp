@@ -366,11 +366,11 @@ void Datalink::to_network_layer(packet *pkt)
 {
     char fileName[50];
     
-    if (access(To_Network_Dir, F_OK) < 0)
-    {
-        mode_t mode = umask(0);
-        mkdir(To_Network_Dir, 0777);
-    }
+    while (access(To_Network_Dir, F_OK) == 0)
+        sleep(2);   // 文件存在，阻塞等待
+
+    mode_t mode = umask(0);
+    mkdir(To_Network_Dir, 0777);
     
     sprintf(fileName, "%s/datalink_network.share.%04d", To_Network_Dir, DatalinkNetworkSeq);
 

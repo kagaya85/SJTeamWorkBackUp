@@ -35,11 +35,12 @@ void Network::to_datalink_layer(packet *pkt)
 {
     char fileName[50];
     
-    if (access(To_Datalink_Dir, F_OK) < 0)
-    {
-        mode_t mode = umask(0);
-        mkdir(To_Datalink_Dir, 0777);
-    }
+    while (access(To_Datalink_Dir, F_OK) == 0)
+        sleep(2);   // 文件存在，阻塞等待
+
+    // 建立文件
+    mode_t mode = umask(0);
+    mkdir(To_Datalink_Dir, 0777);
     
     sprintf(fileName, "%s/network_datalink.share.%04d", To_Datalink_Dir, NetworkDatalinkSeq);
 
