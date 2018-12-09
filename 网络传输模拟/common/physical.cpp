@@ -57,7 +57,7 @@ int data_exchange(const int side, const pid_t pid, const int msgid, const int so
             if(_rs > 0)
 			{
                 cerr << (side == SENDER ? "SENDER " : "RECEIVER ");
-				cerr << "what do you fuxking read??? _r = " << _rs << endl;
+				// cerr << "what do you fuxking read??? _r = " << _rs << endl;
                 return SOCKET_ERROR;
 			}
             if(_rs < 0)
@@ -74,6 +74,7 @@ int data_exchange(const int side, const pid_t pid, const int msgid, const int so
         {
             int read_res;
             read_res = read_bitstream(side, sockfd, NODatapackLen, buffer_rec);
+            
             if(read_res == READ_CLOSE)
                 return SOCKET_CLOSE;
             else if(read_res == READ_ERROR)
@@ -96,6 +97,7 @@ int data_exchange(const int side, const pid_t pid, const int msgid, const int so
             // upload message to DataLink_layer
             msg_snd.msg_type = FROM_PHYSICAL;
             memcpy(msg_snd.data, buffer_rec, buffer_rec_len);
+            // cout << "To datalink ack " << *((int*)(&msg_snd.data[8])) << endl;
             do
             {
                 errno = 0;
@@ -146,6 +148,7 @@ int data_exchange(const int side, const pid_t pid, const int msgid, const int so
                     else
                         return FROM_DATALINK_ERROR; 
                 }
+                // cout << "From datalink ack " << *((int*)(&msg_rec.data[8])) << endl;
                 memcpy(buffer_snd, msg_rec.data, DatapackLen);
 
                 // cout << (side == SENDER ? "SENDER " : "RECEIVER ");

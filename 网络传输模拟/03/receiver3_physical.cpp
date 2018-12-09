@@ -69,9 +69,9 @@ int main(const int argc, char *argv[])
         cout << "Receiver: Physical Connection Complete." << endl;
         int flag = fcntl(sockfd, F_GETFL, 0);
 		fcntl(sockfd, F_SETFL, flag | O_NONBLOCK);
-        cout << "1" << endl;
+
 		int exchgres = data_exchange(RECEIVER, DatalinkLayer_pid, DatalinkLayer_msgid, sockfd);
-        cout << "1 end" << endl;        
+      
         if(exchgres == SOCKET_ERROR)
         {
             close(sockfd);

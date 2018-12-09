@@ -460,6 +460,7 @@ void Datalink::from_physical_layer(frame *frm)
     cout << "Datalink: " << "receive frame from physical layer" << endl;
 
     int tmpkind;
+    // cout << "From physical ack " << *((int*)(&msg.data[8])) << endl;
     memcpy(&tmpkind, msg.data, 4);
     memcpy(&(frm->seq), &msg.data[4], 4);
     memcpy(&(frm->ack), &msg.data[8], 4);
@@ -477,7 +478,7 @@ void Datalink::to_physical_layer(frame *frm)
     int tmpkind;
     seq_nr tmpack;
     seq_nr tmpseq;
-
+    
     tmpkind = htonl(frm->kind);
     tmpack = htonl(frm->ack);
     tmpseq = htonl(frm->seq);
@@ -488,6 +489,8 @@ void Datalink::to_physical_layer(frame *frm)
     memcpy(&msg.data[12], frm->info.data, MAX_PKT);
     msg.msg_type = FROM_DATALINK;
     
+    // cout << "To physical ack " << *((int*)(&msg.data[8])) << endl;
+
     // 向队列发送
     int ret;
     do
