@@ -42,7 +42,7 @@ int main(const int argc, const char* argv[])
             continue;
         }
 
-        cout << "Sender Network: ready to pick packet" << endl;
+        // cout << "Sender Network: ready to pick packet" << endl;
 
         if(EndPackFlag) // send EndPacket
         {

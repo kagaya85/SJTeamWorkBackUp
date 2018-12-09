@@ -89,7 +89,7 @@ int data_exchange(const int side, const pid_t pid, const int msgid, const int so
 
             // upload message to DataLink_layer
             msg_data.msg_type = FROM_PHYSICAL;
-            //strcpy(msg_data.text, buffer_rec);
+            // strcpy(msg_data.text, buffer_rec);
             memcpy(msg_data.data, buffer_rec, buffer_rec_len);
             do
             {

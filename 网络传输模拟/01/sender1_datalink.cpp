@@ -28,13 +28,7 @@ int main()
     {
         pid = getPidByName("netwo");
         if(pid < 0)
-        {
-            msgctl(msqid, IPC_STAT, &msgbuf);
-            if(msgbuf.msg_qnum == 0)
-                return 0;
-            else
-                sleep(5);
-        }
+            return 0;
         dl.from_network_layer(&buffer);
         s.info = buffer;
         dl.to_physical_layer(&s);

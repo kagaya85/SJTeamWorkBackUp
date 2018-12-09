@@ -51,7 +51,21 @@ Datalink::~Datalink()
         delete header;
         header = p;
     }
-    msgctl(msgid, IPC_RMID, NULL);
+
+    struct msqid_ds msgbuf;
+    while (true) 
+    {
+        msgctl(msgid, IPC_STAT, &msgbuf);
+        cout << "Datalink: " << "msgbuf.msg_qnum " << msgbuf.msg_qnum << endl;
+        if(msgbuf.msg_qnum == 0)
+        {
+            msgctl(msgid, IPC_RMID, NULL);
+            cout << "Datalink: " << "Exit" << endl;
+            break;
+        }
+        else
+            sleep(2);
+    }
 }
 
 void Datalink::start_timer(seq_nr k)

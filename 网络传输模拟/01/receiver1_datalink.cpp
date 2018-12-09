@@ -22,7 +22,6 @@ int main()
     }
     cout << "Datalink: " << "get physical pid " << pid << endl;
 
-    struct msqid_ds msgbuf;
 
     while(true)
     {
@@ -30,13 +29,7 @@ int main()
         dl.from_physical_layer(&r);
         pid = getPidByName("netwo");
         if(pid < 0)
-        {
-            msgctl(msqid, IPC_STAT, &msgbuf);
-            if(msgbuf.msg_qnum == 0)
                 return 0;
-            else
-                sleep(5);
-        }
         dl.to_network_layer(&r.info);
     }
 
