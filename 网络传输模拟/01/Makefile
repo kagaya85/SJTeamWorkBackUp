@@ -84,4 +84,4 @@ receiver:
 sender:
 	./sender1_datalink &
 	./sender1_network ALL.txt &
-	./sender1_physical 192.168.137.39 4000 &
+	./sender1_physical 192.168.137.64 4000 &
