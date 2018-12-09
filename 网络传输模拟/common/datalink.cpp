@@ -421,7 +421,7 @@ void Datalink::from_physical_layer(frame *frm)
     do
     {
         errno = 0;
-        ret = msgrcv(msgid, &msg, MSGBUFF_SIZE, FROM_PHYSICAL, 0);
+        ret = msgrcv(msgid, (void *)&msg, MSGBUFF_SIZE, FROM_PHYSICAL, 0);
     } while (ret < 0 && errno == EINTR);
 
     if (ret < 0)
@@ -463,7 +463,7 @@ void Datalink::to_physical_layer(frame *frm)
     do
     {
         errno = 0;
-        ret = msgsnd(msgid, &msg, MSGBUFF_SIZE, 0);
+        ret = msgsnd(msgid, (void *)&msg, MSGBUFF_SIZE, 0);
     } while (ret < 0 && errno == EINTR);
     
     struct msqid_ds msgbuf;

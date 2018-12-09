@@ -26,7 +26,7 @@ int data_exchange(const int side, const pid_t pid, const int msgid, const int so
 
     unsigned int read_cnt = 0, write_cnt = 0;
 
-    struct Message msg_data;
+    struct Message msg_rec, msg_snd;
 
     while(TaihouDaisuki)
     {
@@ -92,14 +92,13 @@ int data_exchange(const int side, const pid_t pid, const int msgid, const int so
             ++read_cnt; ////////////////////
 
             // upload message to DataLink_layer
-            msg_data.msg_type = FROM_PHYSICAL;
-            // strcpy(msg_data.text, buffer_rec);
-            memcpy(msg_data.data, buffer_rec, buffer_rec_len);
+            msg_snd.msg_type = FROM_PHYSICAL;
+            memcpy(msg_snd.data, buffer_rec, buffer_rec_len);
             do
             {
                 errno = 0;
                 cout << "msgid = " << msgid << endl;
-                _snds = msgsnd(msgid, (void *)&msg_data, MSGBUFF_SIZE, 0);
+                _snds = msgsnd(msgid, (void *)&msg_snd, MSGBUFF_SIZE, 0);
             }while(_snds == -1 && errno == EINTR);
             if (_snds == -1)
                 return TO_DATALINK_ERROR;
@@ -124,10 +123,11 @@ int data_exchange(const int side, const pid_t pid, const int msgid, const int so
             // loop to send frame that in message queue
             while(TaihouDaisuki)
             {
+                msg_rec.msg_type = FROM_DATALINK;
                 do
                 {
                     errno = 0;
-                    _rcvs = msgrcv(msgid, (void *)&msg_data, MSGBUFF_SIZE, FROM_DATALINK, IPC_NOWAIT);
+                    _rcvs = msgrcv(msgid, (void *)&msg_rec, MSGBUFF_SIZE, FROM_DATALINK, IPC_NOWAIT);
                     //cout << "Physical Receiving from datalink..." << endl;
                 }while(_rcvs == -1 && errno == EINTR);
                 
@@ -142,31 +142,26 @@ int data_exchange(const int side, const pid_t pid, const int msgid, const int so
                     else
                         return FROM_DATALINK_ERROR; 
                 }
-                memcpy(buffer_snd, msg_data.data, DatapackLen);
+                memcpy(buffer_snd, msg_rec.data, DatapackLen);
 
                 // cout << (side == SENDER ? "SENDER " : "RECEIVER ");
                 // cout << "Physical receive from datalink layer" << endl;
 
                 cout << (side == SENDER ? "SENDER " : "RECEIVER ");
                 int write_res;
-                if (calc_bitstream(buffer_snd + FramkindLen, SndNoLen) == PureSIGpack)
-                {
+                int pure_pack;
+                if ((pure_pack = calc_bitstream(buffer_snd + FramkindLen, SndNoLen)) == PureSIGpack)
                     write_res = write_bitstream(side, sockfd, NODatapackLen, buffer_snd);
-                    cout << "[" << write_cnt << "]";
-                    cout << "Physical: write data " << SndNoLen << " byte(s)" << endl;
-                    ++write_cnt; ////////////////////
-                }
                 else
-                {
                     write_res = write_bitstream(side, sockfd, DatapackLen, buffer_snd);
-                    cout << "[" << write_cnt << "]";
-                    cout << "Physical: write data " << DatapackLen << " byte(s)" << endl;
-                    ++write_cnt; ////////////////////
-                }
                 if (write_res == WRITE_CLOSE)
                     return SOCKET_CLOSE;
                 else if (write_res == WRITE_ERROR)
                     return WRITE_ERROR;
+
+                cout << "[" << write_cnt << "]";
+                cout << "Physical: write data " << (pure_pack == PureSIGpack ? NODatapackLen : DatapackLen) << " byte(s)" << endl;
+                ++write_cnt; ////////////////////
             }
         }
 
@@ -221,6 +216,7 @@ int write_bitstream(const int side, const int fd, const int Len, const char* con
         cerr << "Data Exchange Write error: " << strerror(errno) << endl;
         return WRITE_ERROR;
     }
+    return WRITE_OK;
 }
 
 unsigned int calc_bitstream(const char* const Bitstream, const int Len)

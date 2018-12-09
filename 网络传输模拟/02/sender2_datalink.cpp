@@ -13,6 +13,7 @@ int main()
         s.info = buffer;
         dl.to_physical_layer(&s);
         dl.wait_for_event(&event);
+        dl.from_physical_layer(&s);
     }
 
     return 0;
