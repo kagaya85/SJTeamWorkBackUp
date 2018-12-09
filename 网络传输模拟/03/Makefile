@@ -30,21 +30,18 @@ NETWORK-SND-SRC = sender3_$(NETWORK-NAME).cpp
 NETWORK-REC-SRC = receiver3_$(NETWORK-NAME).cpp
 NETWORK-SND-TARGET = sender3_$(NETWORK-NAME)
 NETWORK-REC-TARGET = receiver3_$(NETWORK-NAME)
-NETWORK-O = $(ROUTE)$(NETWORK-NAME).o
 
 DATALINK-NAME = datalink
 DATALINK-SND-SRC = sender3_$(DATALINK-NAME).cpp
 DATALINK-REC-SRC = receiver3_$(DATALINK-NAME).cpp
 DATALINK-SND-TARGET = sender3_$(DATALINK-NAME)
 DATALINK-REC-TARGET = receiver3_$(DATALINK-NAME)
-DATALINK-O = $(ROUTE)$(DATALINK-NAME).o
 
 PHYSICAL-NAME = physical
 PHYSICAL-SND-SRC = sender3_$(PHYSICAL-NAME).cpp
 PHYSICAL-REC-SRC = receiver3_$(PHYSICAL-NAME).cpp
 PHYSICAL-SND-TARGET = sender3_$(PHYSICAL-NAME)
 PHYSICAL-REC-TARGET = receiver3_$(PHYSICAL-NAME)
-PHYSICAL-O = $(ROUTE)$(PHYSICAL-NAME).o
 
 .PHONY: clean
 	#avoid to make clean.*
@@ -90,3 +87,4 @@ sender:
 	./sender3_datalink &
 	./sender3_network xldg.txt &
 	./sender3_physical 192.168.137.64 4000 &
+	

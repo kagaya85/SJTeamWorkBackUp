@@ -19,7 +19,7 @@ int main()
         s.seq = next_frame_to_send;
         dl.to_physical_layer(&s);
         dl.start_timer(s.seq);
-        wait_for_event(&event);
+        dl.wait_for_event(&event);
         if (event == frame_arrival)
         {
             dl.from_physical_layer(&s);

@@ -13,7 +13,7 @@ int main()
     frame_expected = 0;
     while(true)
     {
-        wait_for_event(&event);
+        dl.wait_for_event(&event);
         if (event == frame_arrival)
         {
             dl.from_physical_layer(&r);
