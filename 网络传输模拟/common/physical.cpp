@@ -86,7 +86,7 @@ int data_exchange(const int side, const pid_t pid, const int msgid, const int so
             else
                 buffer_rec_len = NODatapackLen;
 
-            cout << "[" << read_cnt << "]" << endl;
+            cout << "[" << read_cnt << "]";
             cout << (side == SENDER ? "SENDER " : "RECEIVER ");
             cout << "Physical: receive data " << buffer_rec_len << " byte(s)" << endl;
             ++read_cnt; ////////////////////
@@ -152,14 +152,14 @@ int data_exchange(const int side, const pid_t pid, const int msgid, const int so
                 if (calc_bitstream(buffer_snd + FramkindLen, SndNoLen) == PureSIGpack)
                 {
                     write_res = write_bitstream(side, sockfd, NODatapackLen, buffer_snd);
-                    cout << "[" << write_cnt << "]" << endl;
+                    cout << "[" << write_cnt << "]";
                     cout << "Physical: write data " << SndNoLen << " byte(s)" << endl;
                     ++write_cnt; ////////////////////
                 }
                 else
                 {
                     write_res = write_bitstream(side, sockfd, DatapackLen, buffer_snd);
-                    cout << "[" << write_cnt << "]" << endl;
+                    cout << "[" << write_cnt << "]";
                     cout << "Physical: write data " << DatapackLen << " byte(s)" << endl;
                     ++write_cnt; ////////////////////
                 }
