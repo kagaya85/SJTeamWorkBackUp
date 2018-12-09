@@ -357,7 +357,7 @@ void Datalink::from_network_layer(packet *pkt)
     close(fd);
     ret = remove(fileName);
     if(ret < 0)
-        cerr << "Datalink: " << "delete file \"" << filename << "\" error" << endl;
+        cerr << "Datalink: " << "delete file \"" << fileName << "\" error" << endl;
     seq_inc(NetworkDatalinkSeq);
     return; // ok
 }
