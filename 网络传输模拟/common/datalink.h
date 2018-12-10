@@ -69,6 +69,7 @@ public:
     static void sigalarm_handle(int signal);
     static void sig_frame_arrival_handle(int signal);
     static void sig_network_layer_ready_handle(int signal);
+    static void sigterm_handle(int signale);
     // /* ÊÂ¼þÅÐ¶Ïº¯Êý */
     // bool is_frameArrivalEvent();
     // bool is_cksumErrEvent();

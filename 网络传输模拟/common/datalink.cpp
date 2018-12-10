@@ -30,6 +30,7 @@ Datalink::Datalink()
     signal(SIGALRM, Datalink::sigalarm_handle);    
     signal(SIG_FRAME_ARRIVAL, Datalink::sig_frame_arrival_handle);
     signal(SIG_NETWORKLAYER_READY, Datalink::sig_network_layer_ready_handle);
+    signal(SIGTERM, Datalink::sigterm_handle);
     
     // 设置已毫秒为单位的闹钟
     struct itimerval new_value;    
@@ -58,20 +59,11 @@ Datalink::~Datalink()
         header = p;
     }
 
-    struct msqid_ds msgbuf;
-    while (true) 
-    {
-        // msgctl(msgid, IPC_STAT, &msgbuf);
-        // cout << "Datalink: " << "msgbuf.msg_qnum " << msgbuf.msg_qnum << endl;
-        if(msgbuf.msg_qnum == 0)
-        {
-            msgctl(msgid, IPC_RMID, NULL);
-            cout << "Datalink: " << "Exit" << endl;
-            break;
-        }
-        else
-            sleep(2);
-    }
+    // 删除队列
+    msgctl(msgid, IPC_RMID, NULL);
+    cout << "Datalink: " << "Exit" << endl;
+    break;
+
 }
 
 void Datalink::start_timer(seq_nr k)
@@ -328,6 +320,12 @@ void Datalink::sig_network_layer_ready_handle(int signal)
     eventQueue.push(network_layer_ready);
     NetworkStatus = Enable;
     cout << "Datalink: get signal SIG_NETWORKLAYER_READY" << endl;
+}
+
+void Datalink::sigterm_handle(int signale)
+{
+    ~Datalink();
+    exit(0);
 }
 
 seq_nr Datalink::get_timeout_seq()

@@ -1,23 +1,3 @@
-#include <iostream>
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
-#include <string>
-
-#include <errno.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <signal.h>
-#include <time.h>
-#include <dirent.h>
-
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <sys/socket.h>
-#include <sys/wait.h>
-
 #include "../common/physical.h"
 #include "../common/common.h"
 
@@ -27,15 +7,24 @@ int starup_client();
 
 int main(const int argc, char *argv[])
 {	
+    // 等待其他进程开启
+    pid_t pid = -1;
+    while(pid < 0)
+    {
+        sleep(1);
+        pid = getPidByName("datal");
+    }
+    cout << "Physical: " << "get datalink pid " << pid << endl;
+
     if(argc != 3)
 	{
 		printf("Usage:%s [ip] [port]\n", argv[0]);
 		return 0;
 	}
 
-    int DatalinkLayer_pid = get_pid_by_name("protocol4_datalink");  // here use the datalink proc_name
+    pid_t DatalinkLayer_pid = pid;  // here use the datalink proc_name
     int DatalinkLayer_msgid = link_to_DatalinkLayer(IPC_KEY);
-	if(DatalinkLayer_msgid == LINK_ERROR)
+	if(DatalinkLayer_msgid == -1)
 	{
 		cerr << "Failed to Link to Datalink Layer" << endl;
 		return -1;
@@ -76,22 +65,37 @@ int main(const int argc, char *argv[])
             continue;
         }
 
-        if(data_exchange(SENDER, DatalinkLayer_pid, DatalinkLayer_msgid, sockfd) == SOCKET_ERROR)
+        int exchgres = data_exchange(SENDER, DatalinkLayer_pid, DatalinkLayer_msgid, sockfd);
+        if(exchgres == SOCKET_ERROR)
         {
             close(sockfd);
-
-            sockfd = starup_client();
-            FD_ZERO(&sockfds);
-            FD_SET(sockfd, &sockfds);
-
-            continue;
+            cerr << "Physical Layer Sender: Socket Error" << endl;
+            break;
         }
-        else // SOCKET_CLOSE
+		else if(exchgres == FROM_DATALINK_ERROR)
+		{
+			close(sockfd);
+            cerr << "Physical Layer Sender: From Datalink Layer Error" << endl;
+            break;
+		}
+		else if(exchgres == TO_DATALINK_ERROR)
+		{
+			close(sockfd);
+            cerr << "Physical Layer Sender: To Datalink Layer Error" << endl;
+            break;
+		}
+        else if(exchgres == SOCKET_CLOSE) // SOCKET_CLOSE
         {
             cout << "Sender: Physical Connection Disconnected" << endl;
             close(sockfd);
             break;
         }
+		else // SOCKET_OK, this will not be run if works correctly
+		{
+			cout << "Sender: Physical Connection Finish" << endl;
+            close(sockfd);
+            break;
+		}
     }
 	
     cout << "Sender Physical Layer Exit" << endl;
